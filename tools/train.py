@@ -3,17 +3,23 @@ import argparse
 import logging
 import os
 import os.path as osp
-
+from git import Repo
 from mmengine.config import Config, DictAction
 from mmengine.logging import print_log
 from mmengine.registry import RUNNERS
 from mmengine.runner import Runner
-
+import glob
+from termcolor import cprint
 from mmdet.utils import setup_cache_size_limit_of_dynamo
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train a detector")
+    parser.add_argument(
+        "info",
+        default="TEST",
+        help="git info for record",
+    )
     parser.add_argument(
         "--config",
         default="/ai/mnt/code/mmdetection/configs/faster_rcnn/faster-rcnn_r50_fpn_2x_stenosis.py",
@@ -55,6 +61,11 @@ def parse_args():
         default="none",
         help="job launcher",
     )
+    parser.add_argument(
+        "--no_debug",
+        action="store_true",
+        help="weather in debug mode, given = no debug, not given  = in debug",
+    )
     # When using PyTorch version >= 2.0.0, the `torch.distributed.launch`
     # will pass the `--local-rank` parameter to `tools/train.py` instead
     # of `--local_rank`.
@@ -66,15 +77,68 @@ def parse_args():
     return args
 
 
+def git_commit(
+    work_dir,
+    commit_info,
+    levels=10,
+    postfixs=[".py", ".sh"],
+    debug=False,
+):
+    cid = "not generate"
+    branch = "master"
+    if not debug:
+        repo = Repo(work_dir)
+        toadd = []
+        branch = repo.active_branch.name
+        for i in range(levels):
+            for postfix in postfixs:
+                filename = glob.glob(work_dir + (i + 1) * "/*" + postfix)
+                for x in filename:
+                    if (
+                        not ("play" in x)
+                        and not ("local" in x)
+                        and not ("Untitled" in x)
+                        and not ("wandb" in x)
+                    ):
+                        toadd.append(x)
+        index = repo.index  # 获取暂存区对象
+        index.add(toadd)
+        index.commit(commit_info)
+        cid = repo.head.commit.hexsha
+
+    commit_tag = (
+        commit_info
+        + "\n"
+        + "COMMIT BRANCH >>> "
+        + branch
+        + " <<< \n"
+        + "COMMIT ID >>> "
+        + cid
+        + " <<<"
+    )
+    record_commit_info = " COMMIT TAG [\n%s]\n" % commit_tag
+    return record_commit_info
+
+
 def main():
     args = parse_args()
 
     # Reduce the number of repeated compilations and improve
     # training speed.
     setup_cache_size_limit_of_dynamo()
+    project_root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    config_name = osp.splitext(osp.basename(args.config))[0]
+    commit_info = config_name + "/" + args.info
+    if args.no_debug:
+        git_info = git_commit(work_dir=project_root, commit_info=commit_info)
+        cprint(git_info, color="yellow")
+    else:
+        git_info = "IN DEBUG"
 
     # load config
     cfg = Config.fromfile(args.config)
+    cfg.visualizer.vis_backends[0].get("init_kwargs")["name"] = commit_info
+    cfg.visualizer.vis_backends[0].get("init_kwargs")["git_info"] = git_info
     cfg.launcher = args.launcher
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
@@ -85,9 +149,7 @@ def main():
         cfg.work_dir = args.work_dir
     elif cfg.get("work_dir", None) is None:
         # use config filename as default work_dir if cfg.work_dir is None
-        cfg.work_dir = osp.join(
-            "./work_dirs", osp.splitext(osp.basename(args.config))[0]
-        )
+        cfg.work_dir = osp.join(project_root + "/work_dirs", config_name)
 
     # enable automatic-mixed-precision training
     if args.amp is True:
