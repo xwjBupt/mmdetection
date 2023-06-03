@@ -12,7 +12,7 @@ data_preprocessor = dict(
     bgr_to_rgb=True,
     pad_size_divisor=32,
 )
-
+model = dict(data_preprocessor=data_preprocessor)
 
 # data_preprocessor = dict(
 #     type="DetDataPreprocessor",

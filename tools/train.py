@@ -134,6 +134,7 @@ def main():
         cprint(git_info, color="yellow")
     else:
         git_info = "<<<DEBUG>>>"
+        os.environ["WANDB_MODE"] = "dryrun"
 
     # load config
     cfg = Config.fromfile(args.config)
