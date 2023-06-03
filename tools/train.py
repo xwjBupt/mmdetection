@@ -16,7 +16,7 @@ from mmdet.utils import setup_cache_size_limit_of_dynamo
 def parse_args():
     parser = argparse.ArgumentParser(description="Train a detector")
     parser.add_argument(
-        "info",
+        "--info",
         default="TEST",
         help="git info for record",
     )
@@ -116,7 +116,7 @@ def git_commit(
         + cid
         + " <<<"
     )
-    record_commit_info = " COMMIT TAG [\n%s]\n" % commit_tag
+    record_commit_info = "COMMIT TAG [\n%s]\n" % commit_tag
     return record_commit_info
 
 
