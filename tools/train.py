@@ -133,12 +133,13 @@ def main():
         git_info = git_commit(work_dir=project_root, commit_info=commit_info)
         cprint(git_info, color="yellow")
     else:
-        git_info = "IN DEBUG"
+        git_info = "<<<DEBUG>>>"
 
     # load config
     cfg = Config.fromfile(args.config)
-    cfg.visualizer.vis_backends[0].get("init_kwargs")["name"] = commit_info
-    cfg.visualizer.vis_backends[0].get("init_kwargs")["git_info"] = git_info
+    cfg.visualizer.vis_backends[0].get("init_kwargs")["name"] = args.info
+    cfg.visualizer.vis_backends[0].get("init_kwargs")["group"] = config_name
+    cfg.env_cfg["git_info"] = git_info
     cfg.launcher = args.launcher
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
