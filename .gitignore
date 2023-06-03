@@ -122,3 +122,5 @@ work_dirs/
 *.py~
 *.sh~
 *play*
+work_dirs/*
+wandb/*

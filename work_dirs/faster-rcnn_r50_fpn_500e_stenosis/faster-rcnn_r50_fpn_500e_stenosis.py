@@ -235,7 +235,7 @@ env_cfg = dict(
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
     dist_cfg=dict(backend='nccl'),
     git_info=
-    'COMMIT TAG [\nfaster-rcnn_r50_fpn_500e_stenosis/500epoch-baserun\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> 35f60dd1a99fe25a4ac94d531d39f762945ff50e <<<]\n'
+    'COMMIT TAG [\nfaster-rcnn_r50_fpn_500e_stenosis/500epoch-baserun\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> 907be2f7e70eb1d7b49a757ed9010069eabe9a1a <<<]\n'
 )
 vis_backends = [
     dict(
