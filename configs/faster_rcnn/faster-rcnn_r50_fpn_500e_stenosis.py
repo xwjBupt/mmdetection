@@ -23,3 +23,18 @@ vis_backends = [
 visualizer = dict(
     type="DetLocalVisualizer", vis_backends=vis_backends, name="visualizer"
 )
+
+max_epochs = 500
+# learning rate
+param_scheduler = [
+    dict(type="LinearLR", start_factor=1e-6, by_epoch=False, begin=0, end=1500),
+    dict(
+        type="MultiStepLR",
+        begin=0,
+        end=max_epochs,
+        by_epoch=True,
+        milestones=[250, 400],
+        gamma=0.1,
+    ),
+]
+train_cfg = dict(max_epochs=max_epochs)
