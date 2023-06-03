@@ -7,6 +7,7 @@ from mmengine.fileio import load
 from mmengine.utils import is_abs
 
 from ..registry import DATASETS
+import pdb
 
 
 @DATASETS.register_module()
@@ -21,21 +22,23 @@ class BaseDetDataset(BaseDataset):
             corresponding backend. Defaults to None.
     """
 
-    def __init__(self,
-                 *args,
-                 seg_map_suffix: str = '.png',
-                 proposal_file: Optional[str] = None,
-                 file_client_args: dict = None,
-                 backend_args: dict = None,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        *args,
+        seg_map_suffix: str = ".png",
+        proposal_file: Optional[str] = None,
+        file_client_args: dict = None,
+        backend_args: dict = None,
+        **kwargs
+    ) -> None:
         self.seg_map_suffix = seg_map_suffix
         self.proposal_file = proposal_file
         self.backend_args = backend_args
         if file_client_args is not None:
             raise RuntimeError(
-                'The `file_client_args` is deprecated, '
-                'please use `backend_args` instead, please refer to'
-                'https://github.com/open-mmlab/mmdetection/blob/main/configs/_base_/datasets/coco_detection.py'  # noqa: E501
+                "The `file_client_args` is deprecated, "
+                "please use `backend_args` instead, please refer to"
+                "https://github.com/open-mmlab/mmdetection/blob/main/configs/_base_/datasets/coco_detection.py"  # noqa: E501
             )
         super().__init__(*args, **kwargs)
 
@@ -62,6 +65,7 @@ class BaseDetDataset(BaseDataset):
         if self._fully_initialized:
             return
         # load data information
+        # pdb.set_trace()
         self.data_list = self.load_data_list()
         # get proposals from file
         if self.proposal_file is not None:
@@ -75,6 +79,7 @@ class BaseDetDataset(BaseDataset):
 
         # serialize data_list
         if self.serialize_data:
+            # pdb.set_trace()
             self.data_bytes, self.data_address = self._serialize_data()
 
         self._fully_initialized = True
@@ -94,18 +99,17 @@ class BaseDetDataset(BaseDataset):
         # TODO: Add Unit Test after fully support Dump-Proposal Metric
         if not is_abs(self.proposal_file):
             self.proposal_file = osp.join(self.data_root, self.proposal_file)
-        proposals_list = load(
-            self.proposal_file, backend_args=self.backend_args)
+        proposals_list = load(self.proposal_file, backend_args=self.backend_args)
         assert len(self.data_list) == len(proposals_list)
         for data_info in self.data_list:
-            img_path = data_info['img_path']
+            img_path = data_info["img_path"]
             # `file_name` is the key to obtain the proposals from the
             # `proposals_list`.
             file_name = osp.join(
-                osp.split(osp.split(img_path)[0])[-1],
-                osp.split(img_path)[-1])
+                osp.split(osp.split(img_path)[0])[-1], osp.split(img_path)[-1]
+            )
             proposals = proposals_list[file_name]
-            data_info['proposals'] = proposals
+            data_info["proposals"] = proposals
 
     def get_cat_ids(self, idx: int) -> List[int]:
         """Get COCO category ids by index.
@@ -116,5 +120,5 @@ class BaseDetDataset(BaseDataset):
         Returns:
             List[int]: All categories in the image of specified index.
         """
-        instances = self.get_data_info(idx)['instances']
-        return [instance['bbox_label'] for instance in instances]
+        instances = self.get_data_info(idx)["instances"]
+        return [instance["bbox_label"] for instance in instances]
