@@ -22,7 +22,7 @@ def parse_args():
     )
     parser.add_argument(
         "--config",
-        default="/ai/mnt/code/mmdetection/configs/faster_rcnn/faster-rcnn_r50_fpn_2x_stenosis.py",
+        default="/ai/mnt/code/mmdetection/configs/swin/retinanet_swin-t-p4-w7_fpn_500e_stenosis.py",
         help="train config file path",
     )
     parser.add_argument("--work-dir", help="the dir to save logs and models")
