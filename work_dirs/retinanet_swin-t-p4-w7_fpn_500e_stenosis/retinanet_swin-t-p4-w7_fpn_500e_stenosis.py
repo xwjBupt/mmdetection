@@ -95,8 +95,8 @@ test_pipeline = [
                    'scale_factor'))
 ]
 train_dataloader = dict(
-    batch_size=32,
-    num_workers=8,
+    batch_size=24,
+    num_workers=12,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     batch_sampler=dict(type='AspectRatioBatchSampler'),
@@ -115,8 +115,8 @@ train_dataloader = dict(
         ],
         backend_args=None))
 val_dataloader = dict(
-    batch_size=16,
-    num_workers=8,
+    batch_size=12,
+    num_workers=6,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
@@ -137,8 +137,8 @@ val_dataloader = dict(
         ],
         backend_args=None))
 test_dataloader = dict(
-    batch_size=16,
-    num_workers=8,
+    batch_size=12,
+    num_workers=6,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
@@ -202,7 +202,7 @@ env_cfg = dict(
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
     dist_cfg=dict(backend='nccl'),
     git_info=
-    'COMMIT TAG [\nretinanet_swin-t-p4-w7_fpn_500e_stenosis/500epoch-baserun\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> d9106eda0ffeac3c73f02c400a00bfeb2bff7abf <<<]\n'
+    'COMMIT TAG [\nretinanet_swin-t-p4-w7_fpn_500e_stenosis/500epoch-baserun\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> 0c6ac0bc7cbb92fbf46cfadf9e1f86c50d90fd72 <<<]\n'
 )
 vis_backends = [
     dict(

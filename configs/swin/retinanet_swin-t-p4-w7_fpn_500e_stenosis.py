@@ -39,7 +39,7 @@ model = dict(
 )
 
 # optimizer
-optim_wrapper = dict(optimizer=dict(lr=0.01))
+optim_wrapper = dict(optimizer=dict(lr=0.001))
 
 vis_backends = [
     dict(
@@ -55,7 +55,7 @@ max_epochs = 500
 train_cfg = dict(max_epochs=max_epochs)
 
 param_scheduler = [
-    dict(type="LinearLR", start_factor=0.001, by_epoch=False, begin=0, end=1000),
+    dict(type="LinearLR", start_factor=0.0001, by_epoch=False, begin=0, end=1000),
     dict(
         type="MultiStepLR",
         begin=0,
