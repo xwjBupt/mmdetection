@@ -229,7 +229,12 @@ default_hooks = dict(
     param_scheduler=dict(type='ParamSchedulerHook'),
     checkpoint=dict(type='CheckpointHook', interval=1),
     sampler_seed=dict(type='DistSamplerSeedHook'),
-    visualization=dict(type='DetVisualizationHook'))
+    visualization=dict(
+        type='DetVisualizationHook',
+        draw=True,
+        test_out_dir=
+        '/ai/mnt/code/mmdetection/work_dirs/faster-rcnn_r50_fpn_500e_stenosis/Show_epoch485'
+    ))
 env_cfg = dict(
     cudnn_benchmark=False,
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
@@ -255,7 +260,7 @@ visualizer = dict(
     name='visualizer')
 log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 log_level = 'INFO'
-load_from = None
+load_from = '/ai/mnt/code/mmdetection/work_dirs/faster-rcnn_r50_fpn_500e_stenosis/epoch_485.pth'
 resume = False
 data_preprocessor = dict(
     type='DetDataPreprocessor',
