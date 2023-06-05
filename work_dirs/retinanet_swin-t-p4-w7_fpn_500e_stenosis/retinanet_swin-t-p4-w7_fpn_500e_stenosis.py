@@ -175,7 +175,10 @@ val_cfg = dict(type='ValLoop')
 test_cfg = dict(type='TestLoop')
 param_scheduler = [
     dict(
-        type='LinearLR', start_factor=0.001, by_epoch=False, begin=0,
+        type='LinearLR',
+        start_factor=0.0001,
+        by_epoch=False,
+        begin=0,
         end=1000),
     dict(
         type='MultiStepLR',
@@ -187,7 +190,7 @@ param_scheduler = [
 ]
 optim_wrapper = dict(
     type='OptimWrapper',
-    optimizer=dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001))
+    optimizer=dict(type='SGD', lr=0.001, momentum=0.9, weight_decay=0.0001))
 auto_scale_lr = dict(enable=True, base_batch_size=16)
 default_scope = 'mmdet'
 default_hooks = dict(
@@ -202,7 +205,7 @@ env_cfg = dict(
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
     dist_cfg=dict(backend='nccl'),
     git_info=
-    'COMMIT TAG [\nretinanet_swin-t-p4-w7_fpn_500e_stenosis/500epoch-baserun\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> 0c6ac0bc7cbb92fbf46cfadf9e1f86c50d90fd72 <<<]\n'
+    'COMMIT TAG [\nretinanet_swin-t-p4-w7_fpn_500e_stenosis/500epoch-baserun-lr1e-3\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> f1c511563138df8d79592dab6c4f99bf629cf2bb <<<]\n'
 )
 vis_backends = [
     dict(
@@ -216,7 +219,7 @@ visualizer = dict(
             type='WandbVisBackend',
             init_kwargs=dict(
                 project='CEREBRAL_STENOSIS',
-                name='500epoch-baserun',
+                name='500epoch-baserun-lr1e-3',
                 group='retinanet_swin-t-p4-w7_fpn_500e_stenosis'))
     ],
     name='visualizer')
