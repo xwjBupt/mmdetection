@@ -204,9 +204,7 @@ env_cfg = dict(
     cudnn_benchmark=False,
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
     dist_cfg=dict(backend='nccl'),
-    git_info=
-    'COMMIT TAG [\nretinanet_swin-t-p4-w7_fpn_500e_stenosis/500epoch-baserun-lr1e-3\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> f1c511563138df8d79592dab6c4f99bf629cf2bb <<<]\n'
-)
+    git_info='<<<DEBUG>>>')
 vis_backends = [
     dict(
         type='WandbVisBackend',
@@ -219,7 +217,7 @@ visualizer = dict(
             type='WandbVisBackend',
             init_kwargs=dict(
                 project='CEREBRAL_STENOSIS',
-                name='500epoch-baserun-lr1e-3',
+                name='500epoch-baserun-lr1e-3_debug',
                 group='retinanet_swin-t-p4-w7_fpn_500e_stenosis'))
     ],
     name='visualizer')
