@@ -21,8 +21,7 @@ def parse_args():
         help="git info for record",
     )
     parser.add_argument(
-        "--config",
-        default="/ai/mnt/code/mmdetection/configs/swin/retinanet_swin-t-p4-w7_fpn_500e_stenosis.py",
+        "config",
         help="train config file path",
     )
     parser.add_argument("--work-dir", help="the dir to save logs and models")
