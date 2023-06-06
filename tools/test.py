@@ -4,7 +4,12 @@ import os
 import os.path as osp
 import warnings
 from copy import deepcopy
-
+import glob
+from tqdm import tqdm
+import json
+from loguru import logger
+import shutil
+import csv
 from mmengine import ConfigDict
 from mmengine.config import Config, DictAction
 from mmengine.runner import Runner
@@ -15,6 +20,15 @@ from mmdet.registry import RUNNERS
 from mmdet.utils import setup_cache_size_limit_of_dynamo
 
 
+def write_to_csv(filename, content):
+    file_exist = os.path.exists(filename)
+    with open(filename, "a+", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=content.keys())
+        if not file_exist:
+            writer.writeheader()
+        writer.writerow(content)
+
+
 # TODO: support fuse_conv_bn and format_only
 def parse_args():
     parser = argparse.ArgumentParser(description="MMDet test (and eval) a model")
@@ -23,11 +37,11 @@ def parse_args():
         default="/ai/mnt/code/mmdetection/work_dirs/faster-rcnn_r50_fpn_500e_stenosis/faster-rcnn_r50_fpn_500e_stenosis.py",
         help="test config file path",
     )
-    parser.add_argument(
-        "--checkpoint",
-        default="/ai/mnt/code/mmdetection/work_dirs/faster-rcnn_r50_fpn_500e_stenosis/epoch_485.pth",
-        help="checkpoint file",
-    )
+    # parser.add_argument(
+    #     "--checkpoint_dir",
+    #     default="/ai/mnt/code/mmdetection/work_dirs/faster-rcnn_r50_fpn_500e_stenosis/epoch_485.pth",
+    #     help="checkpoint file",
+    # )
     parser.add_argument(
         "--work-dir",
         help="the directory to save the file containing evaluation metrics",
@@ -77,99 +91,139 @@ def parse_args():
 
 def main():
     args = parse_args()
-
     # Reduce the number of repeated compilations and improve
     # testing speed.
     setup_cache_size_limit_of_dynamo()
+    os.environ["WANDB_MODE"] = "dryrun"
     project_root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     config_name = osp.splitext(osp.basename(args.config))[0]
-
-    # load config
+    config_dir = os.path.dirname(args.config)
+    logger.add(os.path.join(config_dir, "test.log"))
+    checkpoints = glob.glob(os.path.join(config_dir, "*.pth"))
     cfg = Config.fromfile(args.config)
+    dataset_name = cfg.dataset_name
     cfg.launcher = args.launcher
+    best_coco_bbox_mAP = -1
+    best_coco_bbox_mAP_epoch = -1
+    best_coco_bbox_result = {}
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
-    if not args.show_dir:
-        args.show_dir = args.checkpoint.replace(".pth", "").replace(
-            "epoch_", "Show_epoch_"
+    logger.info(" <<< INFER START >>> ")
+    for checkpoint in tqdm(checkpoints):
+        # load config
+        epoch_name = os.path.basename(checkpoint).split("_")[-1][:-4]
+        if not args.show_dir:
+            args.show_dir = checkpoint[:-4].replace("epoch_", "Show_epoch_")
+            cfg.work_dir = args.show_dir
+        # work_dir is determined in this priority: CLI > segment in file > filename
+        # if args.work_dir is not None:
+        #     # update configs according to CLI args if args.work_dir is not None
+        #     cfg.work_dir = args.work_dir
+        # elif cfg.get("work_dir", None) is None:
+        #     # use config filename as default work_dir if cfg.work_dir is None
+        #     # cfg.work_dir = osp.join(project_root + "/work_dirs", config_name)
+        #     cfg.work_dir = args.show_dir
+        cfg.load_from = checkpoint
+        if args.show or args.show_dir:
+            cfg = trigger_visualization_hook(cfg, args)
+        if args.tta:
+            if "tta_model" not in cfg:
+                warnings.warn(
+                    "Cannot find ``tta_model`` in config, " "we will set it as default."
+                )
+                cfg.tta_model = dict(
+                    type="DetTTAModel",
+                    tta_cfg=dict(
+                        nms=dict(type="nms", iou_threshold=0.5), max_per_img=100
+                    ),
+                )
+            if "tta_pipeline" not in cfg:
+                warnings.warn(
+                    "Cannot find ``tta_pipeline`` in config, "
+                    "we will set it as default."
+                )
+                test_data_cfg = cfg.test_dataloader.dataset
+                while "dataset" in test_data_cfg:
+                    test_data_cfg = test_data_cfg["dataset"]
+                cfg.tta_pipeline = deepcopy(test_data_cfg.pipeline)
+                flip_tta = dict(
+                    type="TestTimeAug",
+                    transforms=[
+                        [
+                            dict(type="RandomFlip", prob=1.0),
+                            dict(type="RandomFlip", prob=0.0),
+                        ],
+                        [
+                            dict(
+                                type="PackDetInputs",
+                                meta_keys=(
+                                    "img_id",
+                                    "img_path",
+                                    "ori_shape",
+                                    "img_shape",
+                                    "scale_factor",
+                                    "flip",
+                                    "flip_direction",
+                                ),
+                            )
+                        ],
+                    ],
+                )
+                cfg.tta_pipeline[-1] = flip_tta
+            cfg.model = ConfigDict(**cfg.tta_model, module=cfg.model)
+            cfg.test_dataloader.dataset.pipeline = cfg.tta_pipeline
+
+        # build the runner from config
+        if "runner_type" not in cfg:
+            # build the default runner
+            runner = Runner.from_cfg(cfg)
+        else:
+            # build customized runner from the registry
+            # if 'runner_type' is set in the cfg
+            runner = RUNNERS.build(cfg)
+
+        # add `DumpResults` dummy metric
+        if args.out is not None:
+            assert args.out.endswith(
+                (".pkl", ".pickle")
+            ), "The dump file must be a pkl file."
+            runner.test_evaluator.metrics.append(DumpDetResults(out_file_path=args.out))
+
+        # start testing
+        runner.test()
+
+        ### record result ###
+        result_json = glob.glob(os.path.join(args.show_dir, "*", "*.json"))[0]
+        with open(result_json, "r") as load_f:
+            result_dict = json.load(load_f)
+        if result_dict.get("coco/bbox_mAP") > best_coco_bbox_mAP:
+            best_coco_bbox_mAP = result_dict.get("coco/bbox_mAP")
+            best_coco_bbox_mAP_epoch = epoch_name
+            best_coco_bbox_result_dict = result_dict
+            best_coco_bbox_result_dict["Method"] = checkpoint
+        logger.info(
+            " Current best coco_bbox_mAP {} @ Epoch {} \n ".format(
+                best_coco_bbox_mAP, best_coco_bbox_mAP_epoch
+            )
         )
-        cfg.work_dir = args.show_dir
+    print("\n\n")
+    logger.info(" <<< INFER DONE >>> ")
+    best_coco_bbox_result_dict["Method"] = args.config
+    shutil.copy(
+        os.path.join(config_dir, "epoch_{}.pth".format(best_coco_bbox_mAP_epoch)),
+        os.path.join(
+            config_dir, "best_checkpoint_{}.pth".format(best_coco_bbox_mAP_epoch)
+        ),
+    )
 
-    # work_dir is determined in this priority: CLI > segment in file > filename
-    # if args.work_dir is not None:
-    #     # update configs according to CLI args if args.work_dir is not None
-    #     cfg.work_dir = args.work_dir
-    # elif cfg.get("work_dir", None) is None:
-    #     # use config filename as default work_dir if cfg.work_dir is None
-    #     # cfg.work_dir = osp.join(project_root + "/work_dirs", config_name)
-    #     cfg.work_dir = args.show_dir
-    cfg.load_from = args.checkpoint
-
-    if args.show or args.show_dir:
-        cfg = trigger_visualization_hook(cfg, args)
-
-    if args.tta:
-        if "tta_model" not in cfg:
-            warnings.warn(
-                "Cannot find ``tta_model`` in config, " "we will set it as default."
-            )
-            cfg.tta_model = dict(
-                type="DetTTAModel",
-                tta_cfg=dict(nms=dict(type="nms", iou_threshold=0.5), max_per_img=100),
-            )
-        if "tta_pipeline" not in cfg:
-            warnings.warn(
-                "Cannot find ``tta_pipeline`` in config, " "we will set it as default."
-            )
-            test_data_cfg = cfg.test_dataloader.dataset
-            while "dataset" in test_data_cfg:
-                test_data_cfg = test_data_cfg["dataset"]
-            cfg.tta_pipeline = deepcopy(test_data_cfg.pipeline)
-            flip_tta = dict(
-                type="TestTimeAug",
-                transforms=[
-                    [
-                        dict(type="RandomFlip", prob=1.0),
-                        dict(type="RandomFlip", prob=0.0),
-                    ],
-                    [
-                        dict(
-                            type="PackDetInputs",
-                            meta_keys=(
-                                "img_id",
-                                "img_path",
-                                "ori_shape",
-                                "img_shape",
-                                "scale_factor",
-                                "flip",
-                                "flip_direction",
-                            ),
-                        )
-                    ],
-                ],
-            )
-            cfg.tta_pipeline[-1] = flip_tta
-        cfg.model = ConfigDict(**cfg.tta_model, module=cfg.model)
-        cfg.test_dataloader.dataset.pipeline = cfg.tta_pipeline
-
-    # build the runner from config
-    if "runner_type" not in cfg:
-        # build the default runner
-        runner = Runner.from_cfg(cfg)
-    else:
-        # build customized runner from the registry
-        # if 'runner_type' is set in the cfg
-        runner = RUNNERS.build(cfg)
-
-    # add `DumpResults` dummy metric
-    if args.out is not None:
-        assert args.out.endswith(
-            (".pkl", ".pickle")
-        ), "The dump file must be a pkl file."
-        runner.test_evaluator.metrics.append(DumpDetResults(out_file_path=args.out))
-
-    # start testing
-    runner.test()
+    write_to_csv(
+        os.path.join(project_root, dataset_name + ".csv"), best_coco_bbox_result_dict
+    )
+    logger.info(
+        "FINAL best coco_bbox_mAP {} @ Epoch {} with result as {}".format(
+            best_coco_bbox_mAP, best_coco_bbox_mAP_epoch, best_coco_bbox_result_dict
+        )
+    )
 
 
 if __name__ == "__main__":
