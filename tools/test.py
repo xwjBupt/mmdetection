@@ -212,7 +212,6 @@ def main():
             )
         )
     print("\n\n")
-    logger.info(" <<< INFER DONE >>> ")
     best_coco_bbox_result_dict["Method"] = args.config
     if args.pth_type != "best":
         shutil.copy(
@@ -230,6 +229,7 @@ def main():
             best_coco_bbox_mAP, best_coco_bbox_mAP_epoch, best_coco_bbox_result_dict
         )
     )
+    logger.info(" <<< INFER DONE >>> ")
 
 
 if __name__ == "__main__":
