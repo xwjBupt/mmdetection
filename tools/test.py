@@ -34,14 +34,16 @@ def parse_args():
     parser = argparse.ArgumentParser(description="MMDet test (and eval) a model")
     parser.add_argument(
         "--config",
-        default="/ai/mnt/code/mmdetection/work_dirs/faster-rcnn_r50_fpn_500e_stenosis/faster-rcnn_r50_fpn_500e_stenosis.py",
+        default="/ai/mnt/code/mmdetection/work_dirs/retinanet_swin-t-p4-w7_fpn_500e_stenosis/retinanet_swin-t-p4-w7_fpn_500e_stenosis.py",
         help="test config file path",
     )
-    # parser.add_argument(
-    #     "--checkpoint_dir",
-    #     default="/ai/mnt/code/mmdetection/work_dirs/faster-rcnn_r50_fpn_500e_stenosis/epoch_485.pth",
-    #     help="checkpoint file",
-    # )
+    parser.add_argument(
+        "--pth_type",
+        default="best",
+        choices=["best", "all"],
+        type=str,
+        help="checkpoint file",
+    )
     parser.add_argument(
         "--work-dir",
         help="the directory to save the file containing evaluation metrics",
@@ -99,7 +101,10 @@ def main():
     config_name = osp.splitext(osp.basename(args.config))[0]
     config_dir = os.path.dirname(args.config)
     logger.add(os.path.join(config_dir, "test.log"))
-    checkpoints = glob.glob(os.path.join(config_dir, "*.pth"))
+    if args.pth_type == "all":
+        checkpoints = glob.glob(os.path.join(config_dir, "*.pth"))
+    else:
+        checkpoints = glob.glob(os.path.join(config_dir, "*best*.pth"))
     cfg = Config.fromfile(args.config)
     dataset_name = cfg.dataset_name
     cfg.launcher = args.launcher
@@ -209,12 +214,13 @@ def main():
     print("\n\n")
     logger.info(" <<< INFER DONE >>> ")
     best_coco_bbox_result_dict["Method"] = args.config
-    shutil.copy(
-        os.path.join(config_dir, "epoch_{}.pth".format(best_coco_bbox_mAP_epoch)),
-        os.path.join(
-            config_dir, "best_checkpoint_{}.pth".format(best_coco_bbox_mAP_epoch)
-        ),
-    )
+    if args.pth_type != "best":
+        shutil.copy(
+            os.path.join(config_dir, "epoch_{}.pth".format(best_coco_bbox_mAP_epoch)),
+            os.path.join(
+                config_dir, "best_checkpoint_{}.pth".format(best_coco_bbox_mAP_epoch)
+            ),
+        )
 
     write_to_csv(
         os.path.join(project_root, dataset_name + ".csv"), best_coco_bbox_result_dict
