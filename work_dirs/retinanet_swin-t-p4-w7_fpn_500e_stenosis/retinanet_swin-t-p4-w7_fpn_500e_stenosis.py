@@ -137,8 +137,8 @@ val_dataloader = dict(
         ],
         backend_args=None))
 test_dataloader = dict(
-    batch_size=12,
-    num_workers=6,
+    batch_size=16,
+    num_workers=8,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
@@ -170,27 +170,36 @@ test_evaluator = dict(
     metric='bbox',
     format_only=False,
     backend_args=None)
-train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=500, val_interval=1)
+max_epochs = 500
+num_last_epochs = 15
+interval = 10
+base_lr = 0.01
+warmup_epoch = 10
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=500, val_interval=10)
 val_cfg = dict(type='ValLoop')
 test_cfg = dict(type='TestLoop')
-param_scheduler = [
-    dict(
-        type='LinearLR',
-        start_factor=0.0001,
-        by_epoch=False,
-        begin=0,
-        end=1000),
-    dict(
-        type='MultiStepLR',
-        begin=0,
-        end=500,
-        by_epoch=True,
-        milestones=[300, 450],
-        gamma=0.1)
-]
 optim_wrapper = dict(
     type='OptimWrapper',
-    optimizer=dict(type='SGD', lr=0.001, momentum=0.9, weight_decay=0.0001))
+    optimizer=dict(
+        type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005, nesterov=True),
+    paramwise_cfg=dict(norm_decay_mult=0.0, bias_decay_mult=0.0))
+param_scheduler = [
+    dict(
+        type='mmdet.QuadraticWarmupLR',
+        by_epoch=True,
+        begin=0,
+        end=10,
+        convert_to_iter_based=True),
+    dict(
+        type='CosineAnnealingLR',
+        eta_min=0.0005,
+        begin=10,
+        T_max=485,
+        end=485,
+        by_epoch=True,
+        convert_to_iter_based=True),
+    dict(type='ConstantLR', by_epoch=True, factor=1, begin=485, end=500)
+]
 auto_scale_lr = dict(enable=True, base_batch_size=16)
 default_scope = 'mmdet'
 default_hooks = dict(
@@ -205,7 +214,7 @@ env_cfg = dict(
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
     dist_cfg=dict(backend='nccl'),
     git_info=
-    'COMMIT TAG [\nretinanet_swin-t-p4-w7_fpn_500e_stenosis/500epoch-baserun-lr1e-3\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> 9d092bed02530e19d93e08ac59e910dc894b75c0 <<<]\n'
+    'COMMIT TAG [\nretinanet_swin-t-p4-w7_fpn_500e_stenosis/500epoch-newbaserun\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> ace7a09d41a659799e6267ce85dcaee94fcf6d74 <<<]\n'
 )
 vis_backends = [
     dict(
@@ -219,7 +228,7 @@ visualizer = dict(
             type='WandbVisBackend',
             init_kwargs=dict(
                 project='CEREBRAL_STENOSIS',
-                name='500epoch-baserun-lr1e-3',
+                name='500epoch-newbaserun',
                 group='retinanet_swin-t-p4-w7_fpn_500e_stenosis'))
     ],
     name='visualizer')
@@ -234,6 +243,5 @@ data_preprocessor = dict(
     std=[55.8710224233549, 55.8710224233549, 55.8710224233549],
     bgr_to_rgb=True,
     pad_size_divisor=32)
-max_epochs = 500
 launcher = 'none'
 work_dir = '/ai/mnt/code/mmdetection/work_dirs/retinanet_swin-t-p4-w7_fpn_500e_stenosis'
