@@ -1,7 +1,7 @@
 _base_ = [
     "../_base_/models/retinanet_r50_fpn.py",
     "../_base_/datasets/coco_detection_stenosis.py",
-    "../_base_/schedules/schedule_1x.py",
+    "../_base_/schedules/schedule_500e.py",
     "../_base_/default_runtime.py",
 ]
 pretrained = "https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_tiny_patch4_window7_224.pth"  # noqa
@@ -39,7 +39,8 @@ model = dict(
 )
 
 # optimizer
-optim_wrapper = dict(optimizer=dict(lr=0.001))
+train_dataloader = dict(batch_size=24, num_workers=12)
+val_dataloader = dict(batch_size=12, num_workers=6)
 
 vis_backends = [
     dict(
@@ -50,18 +51,3 @@ vis_backends = [
 visualizer = dict(
     type="DetLocalVisualizer", vis_backends=vis_backends, name="visualizer"
 )
-
-max_epochs = 500
-train_cfg = dict(max_epochs=max_epochs)
-
-param_scheduler = [
-    dict(type="LinearLR", start_factor=0.0001, by_epoch=False, begin=0, end=1000),
-    dict(
-        type="MultiStepLR",
-        begin=0,
-        end=max_epochs,
-        by_epoch=True,
-        milestones=[300, 450],
-        gamma=0.1,
-    ),
-]

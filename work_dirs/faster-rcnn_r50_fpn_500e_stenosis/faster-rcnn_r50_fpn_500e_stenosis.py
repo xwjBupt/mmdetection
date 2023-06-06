@@ -203,24 +203,36 @@ test_evaluator = dict(
     metric='bbox',
     format_only=False,
     backend_args=None)
-train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=500, val_interval=1)
+max_epochs = 500
+num_last_epochs = 15
+interval = 10
+base_lr = 0.01
+warmup_epoch = 10
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=500, val_interval=10)
 val_cfg = dict(type='ValLoop')
 test_cfg = dict(type='TestLoop')
-param_scheduler = [
-    dict(
-        type='LinearLR', start_factor=1e-06, by_epoch=False, begin=0,
-        end=1500),
-    dict(
-        type='MultiStepLR',
-        begin=0,
-        end=500,
-        by_epoch=True,
-        milestones=[250, 400],
-        gamma=0.1)
-]
 optim_wrapper = dict(
     type='OptimWrapper',
-    optimizer=dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001))
+    optimizer=dict(
+        type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005, nesterov=True),
+    paramwise_cfg=dict(norm_decay_mult=0.0, bias_decay_mult=0.0))
+param_scheduler = [
+    dict(
+        type='mmdet.QuadraticWarmupLR',
+        by_epoch=True,
+        begin=0,
+        end=10,
+        convert_to_iter_based=True),
+    dict(
+        type='CosineAnnealingLR',
+        eta_min=0.0005,
+        begin=10,
+        T_max=485,
+        end=485,
+        by_epoch=True,
+        convert_to_iter_based=True),
+    dict(type='ConstantLR', by_epoch=True, factor=1, begin=485, end=500)
+]
 auto_scale_lr = dict(enable=True, base_batch_size=16)
 default_scope = 'mmdet'
 default_hooks = dict(
@@ -229,18 +241,13 @@ default_hooks = dict(
     param_scheduler=dict(type='ParamSchedulerHook'),
     checkpoint=dict(type='CheckpointHook', interval=1),
     sampler_seed=dict(type='DistSamplerSeedHook'),
-    visualization=dict(
-        type='DetVisualizationHook',
-        draw=True,
-        test_out_dir=
-        '/ai/mnt/code/mmdetection/work_dirs/faster-rcnn_r50_fpn_500e_stenosis/Show_epoch485'
-    ))
+    visualization=dict(type='DetVisualizationHook'))
 env_cfg = dict(
     cudnn_benchmark=False,
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
     dist_cfg=dict(backend='nccl'),
     git_info=
-    'COMMIT TAG [\nfaster-rcnn_r50_fpn_500e_stenosis/500epoch-baserun\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> 907be2f7e70eb1d7b49a757ed9010069eabe9a1a <<<]\n'
+    'COMMIT TAG [\nfaster-rcnn_r50_fpn_500e_stenosis/500epoch-baserun\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> 4484162284a40d8f509730b007cc97f7e93e502f <<<]\n'
 )
 vis_backends = [
     dict(
@@ -260,7 +267,7 @@ visualizer = dict(
     name='visualizer')
 log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 log_level = 'INFO'
-load_from = '/ai/mnt/code/mmdetection/work_dirs/faster-rcnn_r50_fpn_500e_stenosis/epoch_485.pth'
+load_from = None
 resume = False
 data_preprocessor = dict(
     type='DetDataPreprocessor',
@@ -268,6 +275,5 @@ data_preprocessor = dict(
     std=[55.8710224233549, 55.8710224233549, 55.8710224233549],
     bgr_to_rgb=True,
     pad_size_divisor=32)
-max_epochs = 500
 launcher = 'none'
 work_dir = '/ai/mnt/code/mmdetection/work_dirs/faster-rcnn_r50_fpn_500e_stenosis'
