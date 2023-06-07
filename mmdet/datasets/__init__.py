@@ -3,6 +3,7 @@ from .base_det_dataset import BaseDetDataset
 from .cityscapes import CityscapesDataset
 from .coco import CocoDataset
 from .coco_stenosis import CocoStenosisDataset
+from .coco_stenosis_binary import CocoStenosisBinaryDataset
 from .coco_panoptic import CocoPanopticDataset
 from .crowdhuman import CrowdHumanDataset
 from .dataset_wrappers import MultiImageMixDataset
@@ -45,4 +46,5 @@ __all__ = [
     "Objects365V1Dataset",
     "Objects365V2Dataset",
     "CocoStenosisDataset",
+    "CocoStenosisBinaryDataset",
 ]
