@@ -19,7 +19,7 @@ backend_args = None
 
 train_pipeline = [
     dict(type="LoadImageFromFile", backend_args=backend_args),
-    dict(type="LoadAnnotations", with_bbox=True),
+    dict(type="LoadAnnotations", with_bbox=True, with_mask=True),
     dict(type="Resize", scale=(1333, 800), keep_ratio=True),
     dict(type="RandomFlip", prob=0.5),
     dict(type="PackDetInputs"),
@@ -28,7 +28,7 @@ test_pipeline = [
     dict(type="LoadImageFromFile", backend_args=backend_args),
     dict(type="Resize", scale=(1333, 800), keep_ratio=True),
     # If you don't have a gt annotation, delete the pipeline
-    dict(type="LoadAnnotations", with_bbox=True),
+    dict(type="LoadAnnotations", with_bbox=True, with_mask=True),
     dict(
         type="PackDetInputs",
         meta_keys=("img_id", "img_path", "ori_shape", "img_shape", "scale_factor"),
@@ -71,7 +71,7 @@ train_dataloader = dict(
 # val_evaluator = dict(
 #     type="CocoMetric",
 #     ann_file=data_root + "sten_val/annotations/sten_val.json",
-#     metric="bbox",
+#     metric=['bbox', 'segm'],
 #     format_only=False,
 #     backend_args=backend_args,
 # )
@@ -94,7 +94,7 @@ train_dataloader = dict(
 #         pipeline=test_pipeline))
 # test_evaluator = dict(
 #     type='CocoMetric',
-#     metric='bbox',
+#     metric=['bbox', 'segm'],
 #     format_only=True,
 #     ann_file=data_root + 'annotations/image_info_test-dev2017.json',
 #     outfile_prefix='./work_dirs/coco_detection/test')

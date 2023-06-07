@@ -1,90 +1,135 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-import copy
 import os.path as osp
-from typing import List, Union
-
-from mmengine.fileio import get_local_path
+from typing import Callable, List, Optional, Sequence, Union
 
 from mmdet.registry import DATASETS
-from .api_wrappers import COCO
-from .base_det_dataset import BaseDetDataset
+from .api_wrappers import COCOPanoptic
+from .coco import CocoDataset
 
 
 @DATASETS.register_module()
-class CocoArcadeDataset(BaseDetDataset):
-    """Dataset for COCO_Stenosis"""
+class CocoArcadeDataset(CocoDataset):
+    """Coco dataset for Panoptic segmentation.
+
+    The annotation format is shown as follows. The `ann` field is optional
+    for testing.
+
+    .. code-block:: none
+
+        [
+            {
+                'filename': f'{image_id:012}.png',
+                'image_id':9
+                'segments_info':
+                [
+                    {
+                        'id': 8345037, (segment_id in panoptic png,
+                                        convert from rgb)
+                        'category_id': 51,
+                        'iscrowd': 0,
+                        'bbox': (x1, y1, w, h),
+                        'area': 24315
+                    },
+                    ...
+                ]
+            },
+            ...
+        ]
+
+    Args:
+        ann_file (str): Annotation file path. Defaults to ''.
+        metainfo (dict, optional): Meta information for dataset, such as class
+            information. Defaults to None.
+        data_root (str, optional): The root directory for ``data_prefix`` and
+            ``ann_file``. Defaults to None.
+        data_prefix (dict, optional): Prefix for training data. Defaults to
+            ``dict(img=None, ann=None, seg=None)``. The prefix ``seg`` which is
+            for panoptic segmentation map must be not None.
+        filter_cfg (dict, optional): Config for filter data. Defaults to None.
+        indices (int or Sequence[int], optional): Support using first few
+            data in annotation file to facilitate training/testing on a smaller
+            dataset. Defaults to None which means using all ``data_infos``.
+        serialize_data (bool, optional): Whether to hold memory using
+            serialized objects, when enabled, data loader workers can use
+            shared RAM from master process instead of making a copy. Defaults
+            to True.
+        pipeline (list, optional): Processing pipeline. Defaults to [].
+        test_mode (bool, optional): ``test_mode=True`` means in test phase.
+            Defaults to False.
+        lazy_init (bool, optional): Whether to load annotation during
+            instantiation. In some cases, such as visualization, only the meta
+            information of the dataset is needed, which is not necessary to
+            load annotation file. ``Basedataset`` can skip load annotations to
+            save time by set ``lazy_init=False``. Defaults to False.
+        max_refetch (int, optional): If ``Basedataset.prepare_data`` get a
+            None img. The maximum extra number of cycles to get a valid
+            image. Defaults to 1000.
+    """
 
     METAINFO = {
-        "classes": ("stenosis"),
-        # palette is a list of color tuples, which is used for visualization.
+        "classes": ("stenosis",),
+        "thing_classes": ("stenosis",),
+        "stuff_classes": ("stenosis",),
         "palette": [
             (220, 20, 60),
         ],
     }
-    COCOAPI = COCO
-    # ann_id is unique in coco dataset.
-    ANN_ID_UNIQUE = True
+    COCOAPI = COCOPanoptic
+    # ann_id is not unique in coco panoptic dataset.
+    ANN_ID_UNIQUE = False
 
-    def load_data_list(self) -> List[dict]:
-        """Load annotations from an annotation file named as ``self.ann_file``
+    def __init__(
+        self,
+        ann_file: str = "",
+        metainfo: Optional[dict] = None,
+        data_root: Optional[str] = None,
+        data_prefix: dict = dict(img=None, ann=None, seg=None),
+        filter_cfg: Optional[dict] = None,
+        indices: Optional[Union[int, Sequence[int]]] = None,
+        serialize_data: bool = True,
+        pipeline: List[Union[dict, Callable]] = [],
+        test_mode: bool = False,
+        lazy_init: bool = False,
+        max_refetch: int = 1000,
+        backend_args: dict = None,
+        **kwargs
+    ) -> None:
+        super().__init__(
+            ann_file=ann_file,
+            metainfo=metainfo,
+            data_root=data_root,
+            data_prefix=data_prefix,
+            filter_cfg=filter_cfg,
+            indices=indices,
+            serialize_data=serialize_data,
+            pipeline=pipeline,
+            test_mode=test_mode,
+            lazy_init=lazy_init,
+            max_refetch=max_refetch,
+            backend_args=backend_args,
+            **kwargs
+        )
 
-        Returns:
-            List[dict]: A list of annotation.
-        """  # noqa: E501
-        with get_local_path(
-            self.ann_file, backend_args=self.backend_args
-        ) as local_path:
-            self.coco = self.COCOAPI(local_path)
-        # The order of returned `cat_ids` will not
-        # change with the order of the `classes`
-        self.cat_ids = self.coco.get_cat_ids(cat_names=self.metainfo["classes"])
-        self.cat2label = {cat_id: i for i, cat_id in enumerate(self.cat_ids)}
-        self.cat_img_map = copy.deepcopy(self.coco.cat_img_map)
-
-        img_ids = self.coco.get_img_ids()
-        data_list = []
-        total_ann_ids = []
-        for img_id in img_ids:
-            raw_img_info = self.coco.load_imgs([img_id])[0]
-            raw_img_info["img_id"] = img_id
-
-            ann_ids = self.coco.get_ann_ids(img_ids=[img_id])
-            raw_ann_info = self.coco.load_anns(ann_ids)
-            total_ann_ids.extend(ann_ids)
-
-            parsed_data_info = self.parse_data_info(
-                {"raw_ann_info": raw_ann_info, "raw_img_info": raw_img_info}
-            )
-            data_list.append(parsed_data_info)
-        if self.ANN_ID_UNIQUE:
-            assert len(set(total_ann_ids)) == len(
-                total_ann_ids
-            ), f"Annotation ids in '{self.ann_file}' are not unique!"
-
-        del self.coco
-
-        return data_list
-
-    def parse_data_info(self, raw_data_info: dict) -> Union[dict, List[dict]]:
+    def parse_data_info(self, raw_data_info: dict) -> dict:
         """Parse raw annotation to target format.
 
         Args:
-            raw_data_info (dict): Raw data information load from ``ann_file``
+            raw_data_info (dict): Raw data information load from ``ann_file``.
 
         Returns:
-            Union[dict, List[dict]]: Parsed annotation.
+            dict: Parsed annotation.
         """
         img_info = raw_data_info["raw_img_info"]
         ann_info = raw_data_info["raw_ann_info"]
-
+        # filter out unmatched annotations which have
+        # same segment_id but belong to other image
+        ann_info = [ann for ann in ann_info if ann["image_id"] == img_info["img_id"]]
         data_info = {}
 
-        # TODO: need to change data_prefix['img'] to data_prefix['img_path']
         img_path = osp.join(self.data_prefix["img"], img_info["file_name"])
         if self.data_prefix.get("seg", None):
             seg_map_path = osp.join(
-                self.data_prefix["seg"],
-                img_info["file_name"].rsplit(".", 1)[0] + self.seg_map_suffix,
+                self.data_prefix["seg"], img_info["file_name"].replace("jpg", "png")
             )
         else:
             seg_map_path = None
@@ -95,41 +140,44 @@ class CocoArcadeDataset(BaseDetDataset):
         data_info["width"] = img_info["width"]
 
         instances = []
-        for i, ann in enumerate(ann_info):
+        segments_info = []
+        for ann in ann_info:
             instance = {}
-
-            if ann.get("ignore", False):
-                continue
             x1, y1, w, h = ann["bbox"]
-            inter_w = max(0, min(x1 + w, img_info["width"]) - max(x1, 0))
-            inter_h = max(0, min(y1 + h, img_info["height"]) - max(y1, 0))
-            if inter_w * inter_h == 0:
-                continue
             if ann["area"] <= 0 or w < 1 or h < 1:
                 continue
-            if ann["category_id"] not in self.cat_ids:
-                continue
             bbox = [x1, y1, x1 + w, y1 + h]
+            category_id = ann["category_id"]
+            contiguous_cat_id = self.cat2label[category_id]
 
-            if ann.get("iscrowd", False):
-                instance["ignore_flag"] = 1
-            else:
-                instance["ignore_flag"] = 0
-            instance["bbox"] = bbox
-            instance["bbox_label"] = self.cat2label[ann["category_id"]]
+            is_thing = self.coco.load_cats(ids=category_id)[0]["isthing"]
+            if is_thing:
+                is_crowd = ann.get("iscrowd", False)
+                instance["bbox"] = bbox
+                instance["bbox_label"] = contiguous_cat_id
+                if not is_crowd:
+                    instance["ignore_flag"] = 0
+                else:
+                    instance["ignore_flag"] = 1
+                    is_thing = False
 
-            if ann.get("segmentation", None):
-                instance["mask"] = ann["segmentation"]
-
-            instances.append(instance)
+            segment_info = {
+                "id": ann["id"],
+                "category": contiguous_cat_id,
+                "is_thing": is_thing,
+            }
+            segments_info.append(segment_info)
+            if len(instance) > 0 and is_thing:
+                instances.append(instance)
         data_info["instances"] = instances
+        data_info["segments_info"] = segments_info
         return data_info
 
     def filter_data(self) -> List[dict]:
-        """Filter annotations according to filter_cfg.
+        """Filter images too small or without ground truth.
 
         Returns:
-            List[dict]: Filtered results.
+            List[dict]: ``self.data_list`` after filtering.
         """
         if self.test_mode:
             return self.data_list
@@ -140,24 +188,22 @@ class CocoArcadeDataset(BaseDetDataset):
         filter_empty_gt = self.filter_cfg.get("filter_empty_gt", False)
         min_size = self.filter_cfg.get("min_size", 0)
 
-        # obtain images that contain annotation
-        ids_with_ann = set(data_info["img_id"] for data_info in self.data_list)
-        # obtain images that contain annotations of the required categories
-        ids_in_cat = set()
-        for i, class_id in enumerate(self.cat_ids):
-            ids_in_cat |= set(self.cat_img_map[class_id])
-        # merge the image id sets of the two conditions and use the merged set
-        # to filter out images if self.filter_empty_gt=True
-        ids_in_cat &= ids_with_ann
+        ids_with_ann = set()
+        # check whether images have legal thing annotations.
+        for data_info in self.data_list:
+            for segment_info in data_info["segments_info"]:
+                if not segment_info["is_thing"]:
+                    continue
+                ids_with_ann.add(data_info["img_id"])
 
-        valid_data_infos = []
-        for i, data_info in enumerate(self.data_list):
+        valid_data_list = []
+        for data_info in self.data_list:
             img_id = data_info["img_id"]
             width = data_info["width"]
             height = data_info["height"]
-            if filter_empty_gt and img_id not in ids_in_cat:
+            if filter_empty_gt and img_id not in ids_with_ann:
                 continue
             if min(width, height) >= min_size:
-                valid_data_infos.append(data_info)
+                valid_data_list.append(data_info)
 
-        return valid_data_infos
+        return valid_data_list
