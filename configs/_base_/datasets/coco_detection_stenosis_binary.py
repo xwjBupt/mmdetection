@@ -16,10 +16,6 @@ dataset_name = "STENOSIS_BINARY"
 #         'data/': 's3://openmmlab/datasets/detection/'
 #     }))
 backend_args = None
-data_preprocessor = dict(
-    mean=[144.5754766729963, 144.5754766729963, 144.5754766729963],
-    std=[55.8710224233549, 55.8710224233549, 55.8710224233549],
-)
 
 train_pipeline = [
     dict(type="LoadImageFromFile", backend_args=backend_args),
@@ -46,7 +42,6 @@ train_dataloader = dict(
     batch_sampler=dict(type="AspectRatioBatchSampler"),
     dataset=dict(
         type=dataset_type,
-        data_preprocessor=data_preprocessor,
         data_root=data_root,
         ann_file="annotations/train_binary.json",
         data_prefix=dict(img="train/"),
@@ -63,7 +58,6 @@ val_dataloader = dict(
     sampler=dict(type="DefaultSampler", shuffle=False),
     dataset=dict(
         type=dataset_type,
-        data_preprocessor=data_preprocessor,
         data_root=data_root,
         ann_file="annotations/val_binary.json",
         data_prefix=dict(img="val/"),
