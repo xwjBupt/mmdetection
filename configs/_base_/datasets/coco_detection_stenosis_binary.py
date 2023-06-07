@@ -1,7 +1,7 @@
 # dataset settings
-dataset_type = "CocoStenosisDataset"
+dataset_type = "CocoStenosisBinaryDataset"
 data_root = "/ai/mnt/data/stenosis/selected/"
-dataset_name = "STENOSIS_MULTI"
+dataset_name = "STENOSIS_BINARY"
 # Example to use different file client
 # Method 1: simply set the data root and let the file I/O module
 # automatically infer from prefix (not support LMDB and Memcache yet)
@@ -43,7 +43,7 @@ train_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file="annotations/train_multi.json",
+        ann_file="annotations/train_binary.json",
         data_prefix=dict(img="train/"),
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         pipeline=train_pipeline,
@@ -59,7 +59,7 @@ val_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file="annotations/val_multi.json",
+        ann_file="annotations/val_binary.json",
         data_prefix=dict(img="val/"),
         test_mode=True,
         pipeline=test_pipeline,
@@ -70,7 +70,7 @@ test_dataloader = val_dataloader
 
 val_evaluator = dict(
     type="CocoMetric",
-    ann_file=data_root + "annotations/val_multi.json",
+    ann_file=data_root + "annotations/val_binary.json",
     metric="bbox",
     format_only=False,
     backend_args=backend_args,
