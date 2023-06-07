@@ -111,12 +111,6 @@ dataset_type = 'CocoStenosisBinaryDataset'
 data_root = '/ai/mnt/data/stenosis/selected/'
 dataset_name = 'STENOSIS_BINARY'
 backend_args = None
-data_preprocessor = dict(
-    mean=[144.5754766729963, 144.5754766729963, 144.5754766729963],
-    std=[55.8710224233549, 55.8710224233549, 55.8710224233549],
-    type='DetDataPreprocessor',
-    bgr_to_rgb=True,
-    pad_size_divisor=32)
 train_pipeline = [
     dict(type='LoadImageFromFile', backend_args=None),
     dict(type='LoadAnnotations', with_bbox=True),
@@ -141,9 +135,6 @@ train_dataloader = dict(
     batch_sampler=dict(type='AspectRatioBatchSampler'),
     dataset=dict(
         type='CocoStenosisBinaryDataset',
-        data_preprocessor=dict(
-            mean=[144.5754766729963, 144.5754766729963, 144.5754766729963],
-            std=[55.8710224233549, 55.8710224233549, 55.8710224233549]),
         data_root='/ai/mnt/data/stenosis/selected/',
         ann_file='annotations/train_binary.json',
         data_prefix=dict(img='train/'),
@@ -164,9 +155,6 @@ val_dataloader = dict(
     sampler=dict(type='DefaultSampler', shuffle=False),
     dataset=dict(
         type='CocoStenosisBinaryDataset',
-        data_preprocessor=dict(
-            mean=[144.5754766729963, 144.5754766729963, 144.5754766729963],
-            std=[55.8710224233549, 55.8710224233549, 55.8710224233549]),
         data_root='/ai/mnt/data/stenosis/selected/',
         ann_file='annotations/val_binary.json',
         data_prefix=dict(img='val/'),
@@ -189,9 +177,6 @@ test_dataloader = dict(
     sampler=dict(type='DefaultSampler', shuffle=False),
     dataset=dict(
         type='CocoStenosisBinaryDataset',
-        data_preprocessor=dict(
-            mean=[144.5754766729963, 144.5754766729963, 144.5754766729963],
-            std=[55.8710224233549, 55.8710224233549, 55.8710224233549]),
         data_root='/ai/mnt/data/stenosis/selected/',
         ann_file='annotations/val_binary.json',
         data_prefix=dict(img='val/'),
@@ -264,7 +249,7 @@ env_cfg = dict(
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
     dist_cfg=dict(backend='nccl'),
     git_info=
-    'COMMIT TAG [\nfaster-rcnn_r50_fpn_1000e_lr5e-2_stenosis_binary/1000epoch-5e_2-binary\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> 880c0cb822b870f7135d26eb9fcfff3056657fc7 <<<]\n'
+    'COMMIT TAG [\nfaster-rcnn_r50_fpn_1000e_lr5e-2_stenosis_binary/1000epoch-5e_2-binary\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> b98df035ad645522010a024a3e73f640bff77357 <<<]\n'
 )
 vis_backends = [
     dict(
@@ -286,5 +271,11 @@ log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 log_level = 'INFO'
 load_from = None
 resume = False
+data_preprocessor = dict(
+    type='DetDataPreprocessor',
+    mean=[144.5754766729963, 144.5754766729963, 144.5754766729963],
+    std=[55.8710224233549, 55.8710224233549, 55.8710224233549],
+    bgr_to_rgb=True,
+    pad_size_divisor=32)
 launcher = 'none'
 work_dir = '/ai/mnt/code/mmdetection/work_dirs/faster-rcnn_r50_fpn_1000e_lr5e-2_stenosis_binary'
