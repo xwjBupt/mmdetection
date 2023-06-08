@@ -206,7 +206,12 @@ def main():
     runner.train()
     test_py_dir = os.path.realpath(__file__).replace("train", "test")
     test_config_dir = os.path.join(cfg.work_dir, osp.basename(args.config))
-    os.system("python {} --config {}".format(test_py_dir, test_config_dir))
+    os.system(
+        "python {} --config {} --phase {}".format(test_py_dir, test_config_dir, "train")
+    )
+    os.system(
+        "python {} --config {} --phase {}".format(test_py_dir, test_config_dir, "test")
+    )
 
 
 if __name__ == "__main__":
