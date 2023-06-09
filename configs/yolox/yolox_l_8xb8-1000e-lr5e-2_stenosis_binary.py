@@ -1,14 +1,14 @@
 _base_ = "./yolox_l_8xb8-300e_stenosis_binary.py"
 
 
-dataset_type = "CocoStenosisBinaryDataset"
-fold = "FOLD0"
-data_root = "/ai/mnt/data/stenosis/selected/Binary/%s" % fold
-dataset_name = "STENOSIS_BINARY"
-train_ann_file = "annotations/train_binary.json"
-val_ann_file = "annotations/val_binary.json"
-train_data_prefix = dict(img="train/")
-val_data_prefix = dict(img="val/")
+# dataset_type = "CocoStenosisBinaryDataset"
+# fold = "FOLD0"
+# data_root = "/ai/mnt/data/stenosis/selected/Binary/%s" % fold
+# dataset_name = "STENOSIS_BINARY"
+# train_ann_file = "annotations/train_binary.json"
+# val_ann_file = "annotations/val_binary.json"
+# train_data_prefix = dict(img="train/")
+# val_data_prefix = dict(img="val/")
 
 # training settings
 max_epochs = 1000
@@ -59,5 +59,3 @@ param_scheduler = [
         end=max_epochs,
     ),
 ]
-train_dataloader = dict(batch_size=8, num_workers=4)
-val_dataloader = dict(batch_size=16, num_workers=8)
