@@ -1,6 +1,7 @@
 # dataset settings
 dataset_type = "CocoStenosisBinaryDataset"
-data_root = "/ai/mnt/data/stenosis/selected/"
+fold = "random"
+data_root = "/ai/mnt/data/stenosis/selected/Binary/%s" % fold
 dataset_name = "STENOSIS_BINARY"
 train_ann_file = "annotations/train_binary.json"
 val_ann_file = "annotations/val_binary.json"

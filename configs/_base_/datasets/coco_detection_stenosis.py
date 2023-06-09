@@ -1,6 +1,7 @@
 # dataset settings
 dataset_type = "CocoStenosisDataset"
-data_root = "/ai/mnt/data/stenosis/selected/"
+fold = "random"
+data_root = "/ai/mnt/data/stenosis/selected/Multi/%s/" % fold
 dataset_name = "STENOSIS_MULTI"
 train_ann_file = "annotations/train_multi.json"
 val_ann_file = "/annotations/val_multi.json"

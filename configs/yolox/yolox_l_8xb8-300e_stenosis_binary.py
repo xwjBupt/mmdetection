@@ -1,4 +1,4 @@
-_base_ = "./yolox_l_8xb8-300e_stenosis.py"
+_base_ = "./yolox_s_8xb8-300e_coco.py"
 
 # model settings
 model = dict(
