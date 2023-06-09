@@ -18,10 +18,12 @@ def parse_args():
     parser.add_argument(
         "info",
         default="TEST",
+        type=str,
         help="git info for record",
     )
     parser.add_argument(
         "config",
+        type=str,
         help="train config file path",
     )
     parser.add_argument("--work-dir", help="the dir to save logs and models")
