@@ -5,7 +5,7 @@ _base_ = [
     "../_base_/default_runtime.py",
 ]
 dataset_type = "CocoStenosisBinaryDataset"
-data_root = "/ai/mnt/data/stenosis/selected/Binary/FOLD0/"
+data_root = "/ai/mnt/data/stenosis/selected_small/Binary/FOLD0/"
 dataset_name = "STENOSIS_BINARY"
 train_ann_file = "annotations/train_binary.json"
 val_ann_file = "annotations/val_binary.json"
@@ -13,7 +13,7 @@ train_data_prefix = dict(img="train/")
 val_data_prefix = dict(img="val/")
 train_dataset = dict(
     type="CocoStenosisBinaryDataset",
-    data_root="/ai/mnt/data/stenosis/selected/Binary/FOLD0/",
+    data_root="/ai/mnt/data/stenosis/selected_small/Binary/FOLD0/",
     ann_file="annotations/train_binary.json",
     data_prefix=dict(img="train/"),
 )
@@ -24,14 +24,14 @@ val_dataloader = dict(
     num_workers=8,
     dataset=dict(
         type=dataset_type,
-        data_root="/ai/mnt/data/stenosis/selected/Binary/FOLD0/",
+        data_root="/ai/mnt/data/stenosis/selected_small/Binary/FOLD0/",
         ann_file="annotations/val_binary.json",
         data_prefix=dict(img="val/"),
     ),
 )
 test_dataloader = val_dataloader
 val_evaluator = dict(
-    ann_file="/ai/mnt/data/stenosis/selected/Binary/FOLD0/"
+    ann_file="/ai/mnt/data/stenosis/selected_small/Binary/FOLD0/"
     + "annotations/val_binary.json"
 )
 test_evaluator = val_evaluator

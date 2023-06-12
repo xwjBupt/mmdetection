@@ -119,7 +119,12 @@ backend_args = None
 train_pipeline = [
     dict(type='LoadImageFromFile', backend_args=None),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='RandomCrop', crop_size=(0.5, 0.5), crop_type='relative_range'),
+    dict(
+        type='RandomCrop',
+        crop_size=(0.5, 0.5),
+        crop_type='relative_range',
+        recompute_bbox=True,
+        allow_negative_crop=True),
     dict(type='Resize', scale=(1024, 1024), keep_ratio=True),
     dict(type='RandomFlip', prob=0.5),
     dict(type='PackDetInputs')
@@ -151,7 +156,9 @@ train_dataloader = dict(
             dict(
                 type='RandomCrop',
                 crop_size=(0.5, 0.5),
-                crop_type='relative_range'),
+                crop_type='relative_range',
+                recompute_bbox=True,
+                allow_negative_crop=True),
             dict(type='Resize', scale=(1024, 1024), keep_ratio=True),
             dict(type='RandomFlip', prob=0.5),
             dict(type='PackDetInputs')
@@ -217,10 +224,10 @@ test_evaluator = dict(
     backend_args=None)
 max_epochs = 1000
 num_last_epochs = 50
-interval = 10
+interval = 5
 base_lr = 0.05
 warmup_epoch = 50
-train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=1000, val_interval=10)
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=1000, val_interval=5)
 val_cfg = dict(type='ValLoop')
 test_cfg = dict(type='TestLoop')
 optim_wrapper = dict(
@@ -253,14 +260,17 @@ default_hooks = dict(
     logger=dict(type='LoggerHook', interval=50),
     param_scheduler=dict(type='ParamSchedulerHook'),
     checkpoint=dict(
-        type='CheckpointHook', interval=1, save_best='auto', max_keep_ckpts=5),
+        type='CheckpointHook', interval=10, save_best='auto',
+        max_keep_ckpts=5),
     sampler_seed=dict(type='DistSamplerSeedHook'),
     visualization=dict(type='DetVisualizationHook'))
 env_cfg = dict(
     cudnn_benchmark=False,
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
     dist_cfg=dict(backend='nccl'),
-    git_info='<<<DEBUG>>>')
+    git_info=
+    'COMMIT TAG [\nfaster-rcnn_r50_fpn_1000e_lr5e-2_stenosis_binary_F0/fold0-Crop\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> 1e2226ea6ce784467d63fee6f1bc47b19fd78d6e <<<]\n'
+)
 vis_backends = [
     dict(
         type='WandbVisBackend',
