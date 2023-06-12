@@ -3,7 +3,7 @@
 # training settings
 max_epochs = 1000
 num_last_epochs = 50
-interval = 10
+interval = 5
 base_lr = 0.05
 warmup_epoch = 50
 

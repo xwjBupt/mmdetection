@@ -38,7 +38,9 @@ env_cfg = dict(
     cudnn_benchmark=False,
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
     dist_cfg=dict(backend='nccl'),
-    git_info='<<<DEBUG>>>')
+    git_info=
+    'COMMIT TAG [\nyolox_l_8xb8-1000e-lr5e-2_stenosis_binary_F0/fold0-Crop-CopyPaste\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> 8a0eb5077c6eb98ff78b393717ce217b7246558f <<<]\n'
+)
 vis_backends = [
     dict(
         type='WandbVisBackend',
