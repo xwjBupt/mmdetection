@@ -38,9 +38,7 @@ env_cfg = dict(
     cudnn_benchmark=False,
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
     dist_cfg=dict(backend='nccl'),
-    git_info=
-    'COMMIT TAG [\nyolox_l_8xb8-1000e-lr5e-2_stenosis_binary_F0/fold0\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> e993b25fe6436c143f996f7d24de2d37b7ca5e2d <<<]\n'
-)
+    git_info='<<<DEBUG>>>')
 vis_backends = [
     dict(
         type='WandbVisBackend',
@@ -53,7 +51,7 @@ visualizer = dict(
             type='WandbVisBackend',
             init_kwargs=dict(
                 project='CEREBRAL_STENOSIS',
-                name='fold0',
+                name='fold0-Crop-CopyPaste',
                 group='yolox_l_8xb8-1000e-lr5e-2_stenosis_binary_F0'))
     ],
     name='visualizer')
@@ -239,8 +237,8 @@ test_pipeline = [
                    'scale_factor'))
 ]
 train_dataloader = dict(
-    batch_size=8,
-    num_workers=4,
+    batch_size=32,
+    num_workers=8,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     dataset=dict(
@@ -281,7 +279,7 @@ train_dataloader = dict(
             dict(type='PackDetInputs')
         ]))
 val_dataloader = dict(
-    batch_size=16,
+    batch_size=64,
     num_workers=8,
     persistent_workers=True,
     drop_last=False,
@@ -307,7 +305,7 @@ val_dataloader = dict(
         ],
         backend_args=None))
 test_dataloader = dict(
-    batch_size=16,
+    batch_size=64,
     num_workers=8,
     persistent_workers=True,
     drop_last=False,
