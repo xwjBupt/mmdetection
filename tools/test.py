@@ -35,7 +35,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="MMDet test (and eval) a model")
     parser.add_argument(
         "--config",
-        default="/ai/mnt/code/mmdetection/work_dirs/faster-rcnn_r50_fpn_500e_stenosis/faster-rcnn_r50_fpn_500e_stenosis.py",
+        default="/ai/mnt/code/mmdetection/work_dirs/yolox_l_8xb8-1000e-lr5e-2_stenosis_binary_F0/yolox_l_8xb8-1000e-lr5e-2_stenosis_binary_F0.py",
         help="test config file path",
     )
     parser.add_argument(
