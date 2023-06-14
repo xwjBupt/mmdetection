@@ -109,7 +109,7 @@ model = dict(
             max_per_img=100)))
 dataset_type = 'CocoStenosisBinaryDataset'
 fold = 'random'
-data_root = '/ai/mnt/data/stenosis/selected/Binary/FOLD0/'
+data_root = '/ai/mnt/data/stenosis/selected_small/Binary/FOLD0/'
 dataset_name = 'STENOSIS_BINARY'
 train_ann_file = 'annotations/train_binary.json'
 val_ann_file = 'annotations/val_binary.json'
@@ -139,14 +139,14 @@ test_pipeline = [
                    'scale_factor'))
 ]
 train_dataloader = dict(
-    batch_size=32,
+    batch_size=8,
     num_workers=8,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     batch_sampler=dict(type='AspectRatioBatchSampler'),
     dataset=dict(
         type='CocoStenosisBinaryDataset',
-        data_root='/ai/mnt/data/stenosis/selected/Binary/FOLD0/',
+        data_root='/ai/mnt/data/stenosis/selected_small/Binary/FOLD0/',
         ann_file='annotations/train_binary.json',
         data_prefix=dict(img='train/'),
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
@@ -165,14 +165,14 @@ train_dataloader = dict(
         ],
         backend_args=None))
 val_dataloader = dict(
-    batch_size=64,
+    batch_size=16,
     num_workers=8,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
     dataset=dict(
         type='CocoStenosisBinaryDataset',
-        data_root='/ai/mnt/data/stenosis/selected/Binary/FOLD0/',
+        data_root='/ai/mnt/data/stenosis/selected_small/Binary/FOLD0/',
         ann_file='annotations/val_binary.json',
         data_prefix=dict(img='val/'),
         test_mode=True,
@@ -187,14 +187,14 @@ val_dataloader = dict(
         ],
         backend_args=None))
 test_dataloader = dict(
-    batch_size=64,
+    batch_size=16,
     num_workers=8,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
     dataset=dict(
         type='CocoStenosisBinaryDataset',
-        data_root='/ai/mnt/data/stenosis/selected/Binary/FOLD0/',
+        data_root='/ai/mnt/data/stenosis/selected_small/Binary/FOLD0/',
         ann_file='annotations/val_binary.json',
         data_prefix=dict(img='val/'),
         test_mode=True,
@@ -211,14 +211,14 @@ test_dataloader = dict(
 val_evaluator = dict(
     type='CocoMetric',
     ann_file=
-    '/ai/mnt/data/stenosis/selected/Binary/FOLD0/annotations/val_binary.json',
+    '/ai/mnt/data/stenosis/selected_small/Binary/FOLD0/annotations/val_binary.json',
     metric='bbox',
     format_only=False,
     backend_args=None)
 test_evaluator = dict(
     type='CocoMetric',
     ann_file=
-    '/ai/mnt/data/stenosis/selected/Binary/FOLD0/annotations/val_binary.json',
+    '/ai/mnt/data/stenosis/selected_small/Binary/FOLD0/annotations/val_binary.json',
     metric='bbox',
     format_only=False,
     backend_args=None)
@@ -268,9 +268,7 @@ env_cfg = dict(
     cudnn_benchmark=False,
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
     dist_cfg=dict(backend='nccl'),
-    git_info=
-    'COMMIT TAG [\nfaster-rcnn_r50_fpn_1000e_lr5e-2_stenosis_binary_F0/fold0-Crop\nCOMMIT BRANCH >>> stenosis <<< \nCOMMIT ID >>> 1e2226ea6ce784467d63fee6f1bc47b19fd78d6e <<<]\n'
-)
+    git_info='<<<DEBUG>>>')
 vis_backends = [
     dict(
         type='WandbVisBackend',
@@ -283,7 +281,7 @@ visualizer = dict(
             type='WandbVisBackend',
             init_kwargs=dict(
                 project='CEREBRAL_STENOSIS',
-                name='fold0-Crop',
+                name='fold0-small-IOU0.1',
                 group='faster-rcnn_r50_fpn_1000e_lr5e-2_stenosis_binary_F0'))
     ],
     name='visualizer')
@@ -293,7 +291,7 @@ load_from = None
 resume = False
 train_dataset = dict(
     type='CocoStenosisBinaryDataset',
-    data_root='/ai/mnt/data/stenosis/selected/Binary/FOLD0/',
+    data_root='/ai/mnt/data/stenosis/selected_small/Binary/FOLD0/',
     ann_file='annotations/train_binary.json',
     data_prefix=dict(img='train/'))
 data_preprocessor = dict(

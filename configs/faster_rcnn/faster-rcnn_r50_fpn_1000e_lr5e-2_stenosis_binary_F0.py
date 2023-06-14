@@ -18,9 +18,9 @@ train_dataset = dict(
     data_prefix=dict(img="train/"),
 )
 
-train_dataloader = dict(batch_size=32, num_workers=8, dataset=train_dataset)
+train_dataloader = dict(batch_size=8, num_workers=8, dataset=train_dataset)
 val_dataloader = dict(
-    batch_size=64,
+    batch_size=16,
     num_workers=8,
     dataset=dict(
         type=dataset_type,

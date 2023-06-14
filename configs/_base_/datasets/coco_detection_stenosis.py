@@ -1,4 +1,6 @@
 # dataset settings
+import numpy as np
+
 dataset_type = "CocoStenosisDataset"
 fold = "random"
 data_root = "/ai/mnt/data/stenosis/selected/Multi/%s/" % fold
@@ -77,6 +79,9 @@ val_evaluator = dict(
     type="CocoMetric",
     ann_file=data_root + "annotations/val_multi.json",
     metric="bbox",
+    iou_thrs=np.linspace(
+        0.1, 0.95, int(np.round((0.95 - 0.1) / 0.05)) + 1, endpoint=True
+    ),
     format_only=False,
     backend_args=backend_args,
 )

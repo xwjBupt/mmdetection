@@ -1,4 +1,6 @@
 # dataset settings
+import numpy as np
+
 dataset_type = "CocoStenosisBinaryDataset"
 fold = "random"
 data_root = "/ai/mnt/data/stenosis/selected/Binary/%s" % fold
@@ -79,7 +81,6 @@ val_dataloader = dict(
     ),
 )
 test_dataloader = val_dataloader
-
 val_evaluator = dict(
     type="CocoMetric",
     ann_file=data_root + "annotations/val_binary.json",
