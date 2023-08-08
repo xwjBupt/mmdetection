@@ -70,9 +70,9 @@ def parse_args():
     )
     parser.add_argument(
         "--gpu_ids",
-        default='0',
+        default='3',
         type=str,
-        help="weather in debug mode, given = no debug, not given  = in debug",
+        help="use which gpu to train",
     )
     # When using PyTorch version >= 2.0.0, the `torch.distributed.launch`
     # will pass the `--local-rank` parameter to `tools/train.py` instead

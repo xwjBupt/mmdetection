@@ -4,10 +4,10 @@ _base_ = [
     '../_base_/schedules/schedule_300e.py', '../_base_/default_runtime.py'
 ]
 
-train_dataloader = dict(batch_size=8, num_workers=8)
+train_dataloader = dict(batch_size=8, num_workers=16)
 val_dataloader = dict(
     batch_size=8,
-    num_workers=16,
+    num_workers=8,
 )
 data_preprocessor = dict(
     type="DetDataPreprocessor",
