@@ -148,7 +148,7 @@ def main():
     # load config
     cfg = Config.fromfile(args.config)
     cfg.visualizer.vis_backends[0].get("init_kwargs")["name"] = args.info
-    cfg.visualizer.vis_backends[0].get("init_kwargs")["group"] = config_name
+    #cfg.visualizer.vis_backends[0].get("init_kwargs")["group"] = config_name
     cfg.env_cfg["git_info"] = git_info
     cfg.launcher = args.launcher
     if args.cfg_options is not None:
