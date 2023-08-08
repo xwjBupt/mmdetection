@@ -1,6 +1,6 @@
 _base_ = [
     '../_base_/models/faster-rcnn_r50-caffe-c4.py',
-    '../_base_/datasets/coco_detection_binary.py',
+    '../_base_/datasets/coco_detection_stenosis_binary.py',
     '../_base_/schedules/schedule_300e.py', '../_base_/default_runtime.py'
 ]
 
@@ -50,4 +50,8 @@ train_pipeline = [
     dict(type='PackDetInputs')
 ]
 
-train_dataloader = dict(dataset=dict(pipeline=train_pipeline))
+train_dataloader = dict(dataset=dict(pipeline=train_pipeline), batch_size=8, num_workers=8)
+val_dataloader = dict(
+    batch_size=8,
+    num_workers=16,
+)
