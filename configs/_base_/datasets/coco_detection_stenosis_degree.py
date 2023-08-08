@@ -1,12 +1,11 @@
 # dataset settings
 import numpy as np
 
-dataset_type = "CocoStenosisDataset"
-fold = "random"
-data_root = "/ai/mnt/data/stenosis/selected/Multi/%s/" % fold
-dataset_name = "STENOSIS_MULTI"
-train_ann_file = "annotations/train_multi.json"
-val_ann_file = "/annotations/val_multi.json"
+dataset_type = "CocoStenosisDegreeDataset"
+data_root = "/home/xwj/Xdata/stenosis/selected/Degree/FOLD0"
+dataset_name = "STENOSIS_DEGREE"
+train_ann_file = "annotations/train_degree.json"
+val_ann_file = "/annotations/val_degree.json"
 train_data_prefix = dict(img="train/")
 val_data_prefix = dict(img="val/")
 # Example to use different file client

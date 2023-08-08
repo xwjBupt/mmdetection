@@ -1,11 +1,11 @@
 ### xwj personal setting ###
 # training schedule for 500e
 # training settings
-max_epochs = 1000
-num_last_epochs = 50
+max_epochs = 100
+num_last_epochs = 10
 interval = 5
 base_lr = 0.05
-warmup_epoch = 50
+warmup_epoch = 5
 
 train_cfg = dict(
     type="EpochBasedTrainLoop", max_epochs=max_epochs, val_interval=interval
@@ -33,7 +33,7 @@ param_scheduler = [
         by_epoch=True,
         begin=0,
         end=warmup_epoch,
-        convert_to_iter_based=True,
+        convert_to_iter_based=False,
     ),
     dict(
         # use cosine lr from 5 to 285 epoch
@@ -43,7 +43,7 @@ param_scheduler = [
         T_max=max_epochs - num_last_epochs,
         end=max_epochs - num_last_epochs,
         by_epoch=True,
-        convert_to_iter_based=True,
+        convert_to_iter_based=False,
     ),
     dict(
         # use fixed lr during last 15 epochs

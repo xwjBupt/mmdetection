@@ -2,7 +2,7 @@ default_scope = "mmdet"
 
 default_hooks = dict(
     timer=dict(type="IterTimerHook"),
-    logger=dict(type="LoggerHook", interval=50),
+    logger=dict(type="LoggerHook", interval=150),
     param_scheduler=dict(type="ParamSchedulerHook"),
     checkpoint=dict(
         type="CheckpointHook", interval=10, save_best="auto", max_keep_ckpts=5
@@ -21,7 +21,7 @@ env_cfg = dict(
 vis_backends = [
     dict(
         type="WandbVisBackend",
-        init_kwargs=dict(project="CEREBRAL_STENOSIS", name=None, group=None),
+        init_kwargs=dict(project="CEREBRAL_STENOSIS_MMDETECTION", name=None, group=None),
     )
 ]
 visualizer = dict(

@@ -4,37 +4,13 @@ _base_ = [
     "../_base_/schedules/schedule_1000e.py",
     "../_base_/default_runtime.py",
 ]
-dataset_type = "CocoStenosisBinaryDataset"
-data_root = "/ai/mnt/data/stenosis/selected/Binary/FOLD0/"
-dataset_name = "STENOSIS_BINARY"
-train_ann_file = "annotations/train_binary.json"
-val_ann_file = "annotations/val_binary.json"
-train_data_prefix = dict(img="train/")
-val_data_prefix = dict(img="val/")
-train_dataset = dict(
-    type="CocoStenosisBinaryDataset",
-    data_root="/ai/mnt/data/stenosis/selected/Binary/FOLD0/",
-    ann_file="annotations/train_binary.json",
-    data_prefix=dict(img="train/"),
-)
 
-train_dataloader = dict(batch_size=8, num_workers=8, dataset=train_dataset)
+
+train_dataloader = dict(batch_size=4, num_workers=8)
 val_dataloader = dict(
-    batch_size=16,
-    num_workers=8,
-    dataset=dict(
-        type=dataset_type,
-        data_root="/ai/mnt/data/stenosis/selected/Binary/FOLD0/",
-        ann_file="annotations/val_binary.json",
-        data_prefix=dict(img="val/"),
-    ),
+    batch_size=8,
+    num_workers=16,
 )
-test_dataloader = val_dataloader
-val_evaluator = dict(
-    ann_file="/ai/mnt/data/stenosis/selected/Binary/FOLD0/"
-    + "annotations/val_binary.json"
-)
-test_evaluator = val_evaluator
 
 data_preprocessor = dict(
     type="DetDataPreprocessor",
@@ -48,7 +24,7 @@ model = dict(data_preprocessor=data_preprocessor)
 vis_backends = [
     dict(
         type="WandbVisBackend",
-        init_kwargs=dict(project="CEREBRAL_STENOSIS", name="BASE_RUN_HODLER"),
+        init_kwargs=dict(project="CEREBRAL_STENOSIS_MMDETECTION", name="BASE_RUN_HODLER", group = "STENOSIS_BINARY"),
     )
 ]
 visualizer = dict(

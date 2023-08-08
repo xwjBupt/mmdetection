@@ -2,8 +2,7 @@
 import numpy as np
 
 dataset_type = "CocoStenosisBinaryDataset"
-fold = "random"
-data_root = "/ai/mnt/data/stenosis/selected/Binary/%s" % fold
+data_root = "/home/xwj/Xdata/stenosis/selected/Binary/FOLD0/COCO"
 dataset_name = "STENOSIS_BINARY"
 train_ann_file = "annotations/train_binary.json"
 val_ann_file = "annotations/val_binary.json"
