@@ -50,8 +50,8 @@ train_pipeline = [
     dict(type='PackDetInputs')
 ]
 
-train_dataloader = dict(dataset=dict(pipeline=train_pipeline), batch_size=8, num_workers=8)
+train_dataloader = dict(dataset=dict(pipeline=train_pipeline), batch_size=4, num_workers=8)
 val_dataloader = dict(
     batch_size=8,
-    num_workers=16,
+    num_workers=8,
 )
