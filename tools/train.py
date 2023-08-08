@@ -68,6 +68,12 @@ def parse_args():
         action="store_true",
         help="weather in debug mode, given = no debug, not given  = in debug",
     )
+    parser.add_argument(
+        "--gpu_ids",
+        default='0',
+        type=str,
+        help="weather in debug mode, given = no debug, not given  = in debug",
+    )
     # When using PyTorch version >= 2.0.0, the `torch.distributed.launch`
     # will pass the `--local-rank` parameter to `tools/train.py` instead
     # of `--local_rank`.
@@ -125,7 +131,7 @@ def git_commit(
 
 def main():
     args = parse_args()
-
+    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_ids
     # Reduce the number of repeated compilations and improve
     # training speed.
     setup_cache_size_limit_of_dynamo()
