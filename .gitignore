@@ -125,3 +125,5 @@ work_dirs/
 work_dirs/*
 wandb/*
 *.csv
+output_work_dirs/*
+*output_work_dirs*

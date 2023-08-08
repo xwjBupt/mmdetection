@@ -16,14 +16,15 @@ from mmdet.utils import setup_cache_size_limit_of_dynamo
 def parse_args():
     parser = argparse.ArgumentParser(description="Train a detector")
     parser.add_argument(
-        "info",
+        "--info",
         default="TEST",
         type=str,
         help="git info for record",
     )
     parser.add_argument(
-        "config",
+        "--config",
         type=str,
+        default="/home/xwj/WORK/xcode/mmdetection/configs/faster_rcnn/faster-rcnn_r50_fpn_1000e_lr5e-2_stenosis_binary_F0.py",
         help="train config file path",
     )
     parser.add_argument("--work-dir", help="the dir to save logs and models")
@@ -100,6 +101,7 @@ def git_commit(
                         and not ("local" in x)
                         and not ("Untitled" in x)
                         and not ("wandb" in x)
+                        and not ("output_work_dirs" in x)
                     ):
                         toadd.append(x)
         index = repo.index  # 获取暂存区对象
@@ -152,7 +154,7 @@ def main():
         cfg.work_dir = args.work_dir
     elif cfg.get("work_dir", None) is None:
         # use config filename as default work_dir if cfg.work_dir is None
-        cfg.work_dir = osp.join(project_root + "/work_dirs", config_name)
+        cfg.work_dir = osp.join(project_root + "/output_work_dirs", config_name)
 
     # enable automatic-mixed-precision training
     if args.amp is True:

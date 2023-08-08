@@ -1,8 +1,6 @@
 # dataset settings
-import numpy as np
-
 dataset_type = "CocoStenosisBinaryDataset"
-data_root = "/home/xwj/Xdata/stenosis/selected/Binary/FOLD0/COCO"
+data_root = "/home/xwj/Xdata/stenosis/selected/Binary/FOLD0/COCO/"
 dataset_name = "STENOSIS_BINARY"
 train_ann_file = "annotations/train_binary.json"
 val_ann_file = "annotations/val_binary.json"
