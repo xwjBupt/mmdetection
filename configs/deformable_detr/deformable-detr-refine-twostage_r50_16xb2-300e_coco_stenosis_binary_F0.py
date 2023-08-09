@@ -71,7 +71,7 @@ model = dict(
     positional_encoding=dict(num_feats=128, normalize=True, offset=-0.5),
     bbox_head=dict(
         type="DeformableDETRHead",
-        num_classes=80,
+        num_classes=1,
         sync_cls_avg_factor=True,
         loss_cls=dict(
             type="FocalLoss", use_sigmoid=True, gamma=2.0, alpha=0.25, loss_weight=2.0
