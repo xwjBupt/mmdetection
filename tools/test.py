@@ -223,7 +223,7 @@ def main():
         best_coco_bbox_mAP = result_dict.get("coco/bbox_mAP")
         best_coco_bbox_mAP_epoch = epoch_name
         best_coco_bbox_result_dict = result_dict
-        best_coco_bbox_result_dict["Method"] = checkpoint
+        best_coco_bbox_result_dict["Method"] = checkpoint.split("output_work_dirs")[-1]
         best_coco_bbox_result_dict["Phase"] = phase
     print("\n\n")
 

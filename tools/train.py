@@ -70,7 +70,7 @@ def parse_args():
     )
     parser.add_argument(
         "--gpu_ids",
-        default='3',
+        default="3",
         type=str,
         help="use which gpu to train",
     )
@@ -131,7 +131,7 @@ def git_commit(
 
 def main():
     args = parse_args()
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_ids
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_ids
     # Reduce the number of repeated compilations and improve
     # training speed.
     setup_cache_size_limit_of_dynamo()
@@ -148,7 +148,7 @@ def main():
     # load config
     cfg = Config.fromfile(args.config)
     cfg.visualizer.vis_backends[0].get("init_kwargs")["name"] = args.info
-    #cfg.visualizer.vis_backends[0].get("init_kwargs")["group"] = config_name
+    # cfg.visualizer.vis_backends[0].get("init_kwargs")["group"] = config_name
     cfg.env_cfg["git_info"] = git_info
     cfg.launcher = args.launcher
     if args.cfg_options is not None:

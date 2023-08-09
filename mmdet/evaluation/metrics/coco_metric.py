@@ -102,8 +102,11 @@ class CocoMetric(BaseMetric):
 
         # iou_thrs used to compute recall or precision.
         if iou_thrs is None:
+            # iou_thrs = np.linspace(
+            #     0.1, 0.95, int(np.round((0.95 - 0.1) / 0.05)) + 1, endpoint=True
+            # )
             iou_thrs = np.linspace(
-                0.1, 0.95, int(np.round((0.95 - 0.1) / 0.05)) + 1, endpoint=True
+                0.5, 0.95, int(np.round((0.95 - 0.5) / 0.05)) + 1, endpoint=True
             )
         self.iou_thrs = iou_thrs
         self.metric_items = metric_items
