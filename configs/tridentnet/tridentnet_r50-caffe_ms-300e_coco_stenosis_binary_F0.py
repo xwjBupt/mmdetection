@@ -73,4 +73,17 @@ val_dataloader = dict(
     num_workers=8,
 )
 
-visualizer = dict(vis_backends=[dict(init_kwargs=dict(group="STENOSIS_BINARY"))])
+visualizer = dict(
+    type="DetLocalVisualizer",
+    vis_backends=[
+        dict(
+            init_kwargs=dict(
+                group="STENOSIS_BINARY",
+                name="BASE_RUN_HODLER",
+                project="CEREBRAL_STENOSIS_MMDETECTION",
+            ),
+            type="WandbVisBackend",
+        ),
+    ],
+    name="visualizer",
+)
