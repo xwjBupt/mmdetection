@@ -19,12 +19,18 @@ data_preprocessor = dict(
     bgr_to_rgb=True,
     pad_size_divisor=32,
 )
-model = dict(data_preprocessor=data_preprocessor)
+model = dict(
+    data_preprocessor=data_preprocessor, roi_head=dict(bbox_head=dict(num_classes=1))
+)
 
 vis_backends = [
     dict(
         type="WandbVisBackend",
-        init_kwargs=dict(project="CEREBRAL_STENOSIS_MMDETECTION", name="BASE_RUN_HODLER", group = "STENOSIS_BINARY"),
+        init_kwargs=dict(
+            project="CEREBRAL_STENOSIS_MMDETECTION",
+            name="BASE_RUN_HODLER",
+            group="STENOSIS_BINARY",
+        ),
     )
 ]
 visualizer = dict(
