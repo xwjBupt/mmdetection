@@ -196,3 +196,18 @@ param_scheduler = [
 # USER SHOULD NOT CHANGE ITS VALUES.
 # base_batch_size = (16 GPUs) x (2 samples per GPU)
 auto_scale_lr = dict(base_batch_size=32)
+
+visualizer = dict(
+    name="visualizer",
+    type="DetLocalVisualizer",
+    vis_backends=[
+        dict(
+            init_kwargs=dict(
+                group="STENOSIS_BINARY",
+                name="BASE_RUN_HODLER",
+                project="CEREBRAL_STENOSIS_MMDETECTION",
+            ),
+            type="WandbVisBackend",
+        ),
+    ],
+)
