@@ -73,4 +73,4 @@ val_dataloader = dict(
     num_workers=8,
 )
 
-visualizer = dict(vis_backends=dict(init_kwargs=dict(group="STENOSIS_BINARY")))
+visualizer = dict(vis_backends=[dict(init_kwargs=dict(group="STENOSIS_BINARY"))])
