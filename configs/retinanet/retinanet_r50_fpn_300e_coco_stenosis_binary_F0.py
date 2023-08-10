@@ -17,9 +17,7 @@ data_preprocessor = dict(
     bgr_to_rgb=True,
     pad_size_divisor=32,
 )
-model = dict(
-    data_preprocessor=data_preprocessor, roi_head=dict(bbox_head=dict(num_classes=1))
-)
+model = dict(data_preprocessor=data_preprocessor, bbox_head=dict(num_classes=1))
 # learning rate policy
 param_scheduler = [
     dict(type="LinearLR", start_factor=0.001, by_epoch=False, begin=0, end=500),
