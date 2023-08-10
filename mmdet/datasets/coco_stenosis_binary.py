@@ -15,7 +15,7 @@ class CocoStenosisBinaryDataset(BaseDetDataset):
     """Dataset for COCO_Stenosis"""
 
     METAINFO = {
-        "classes": ("S"),
+        "classes": ("S",),
         # palette is a list of color tuples, which is used for visualization.
         "palette": [
             (220, 20, 60),

@@ -21,12 +21,15 @@ env_cfg = dict(
 vis_backends = [
     dict(
         type="WandbVisBackend",
-        init_kwargs=dict(project="CEREBRAL_STENOSIS_MMDETECTION", name=None, group=None),
+        init_kwargs=dict(
+            project="CEREBRAL_STENOSIS_MMDETECTION", name=None, group=None
+        ),
     )
 ]
 visualizer = dict(
     type="DetLocalVisualizer", vis_backends=vis_backends, name="visualizer"
 )
+
 log_processor = dict(type="LogProcessor", window_size=50, by_epoch=True)
 
 log_level = "INFO"
