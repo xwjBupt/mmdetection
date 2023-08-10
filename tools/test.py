@@ -7,6 +7,7 @@ from copy import deepcopy
 import glob
 from tqdm import tqdm
 import json
+import torch
 from loguru import logger
 import shutil
 import csv
@@ -35,12 +36,12 @@ def parse_args():
     parser = argparse.ArgumentParser(description="MMDet test (and eval) a model")
     parser.add_argument(
         "--config",
-        default="/ai/mnt/code/mmdetection/work_dirs/yolox_l_8xb8-1000e-lr5e-2_stenosis_binary_F0/yolox_l_8xb8-1000e-lr5e-2_stenosis_binary_F0.py",
+        default="/home/xwj/WORK/xcode/mmdetection/output_work_dirs/faster-rcnn_r50_fpn_300e_lr5e-2_stenosis_binary_F0/faster-rcnn_r50_fpn_300e_lr5e-2_stenosis_binary_F0.py",
         help="test config file path",
     )
     parser.add_argument(
         "--phase",
-        default="train",
+        default="test",
         choices=["train", "test"],
         type=str,
         help="use last checkpoints to test on train dataset, and the best checkpoints to test on test dataset",
@@ -92,12 +93,29 @@ def parse_args():
     return args
 
 
+import torch
+
+
+def force_cudnn_initialization():
+    s = 32
+    dev = torch.device("cuda")
+    a = torch.nn.functional.conv2d(
+        torch.zeros(s, s, s, s, device=dev), torch.zeros(s, s, s, s, device=dev)
+    )
+    print(a)
+    return a
+
+
+force_cudnn_initialization()
+
+
 def main():
     args = parse_args()
     # Reduce the number of repeated compilations and improve
     # testing speed.
     setup_cache_size_limit_of_dynamo()
     os.environ["WANDB_MODE"] = "dryrun"
+    torch.cuda.empty_cache()
     project_root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     config_name = osp.splitext(osp.basename(args.config))[0]
     config_dir = os.path.dirname(args.config)

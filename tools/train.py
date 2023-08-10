@@ -11,6 +11,7 @@ from mmengine.runner import Runner
 import glob
 from termcolor import cprint
 from mmdet.utils import setup_cache_size_limit_of_dynamo
+import shutil
 
 
 def parse_args():
@@ -24,7 +25,7 @@ def parse_args():
     parser.add_argument(
         "--config",
         type=str,
-        default="/home/xwj/WORK/xcode/mmdetection/configs/faster_rcnn/faster-rcnn_r50_fpn_1000e_lr5e-2_stenosis_binary_F0.py",
+        default="/home/xwj/WORK/xcode/mmdetection/configs/faster_rcnn/faster-rcnn_r50_fpn_300e_lr5e-2_stenosis_binary_F0.py",
         help="train config file path",
     )
     parser.add_argument("--work-dir", help="the dir to save logs and models")
@@ -216,6 +217,7 @@ def main():
     runner.train()
     test_py_dir = os.path.realpath(__file__).replace("train", "test")
     test_config_dir = os.path.join(cfg.work_dir, osp.basename(args.config))
+    shutil.copy(args.config, test_config_dir)
     os.system(
         "python {} --config {} --phase {}".format(test_py_dir, test_config_dir, "train")
     )
