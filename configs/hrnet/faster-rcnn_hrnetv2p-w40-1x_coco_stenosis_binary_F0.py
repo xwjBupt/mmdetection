@@ -30,7 +30,7 @@ model = dict(
                 num_branches=1,
                 block="BOTTLENECK",
                 num_blocks=(4,),
-                num_channels=(40,),
+                num_channels=(64,),
             ),
             stage2=dict(
                 num_modules=1,
