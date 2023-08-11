@@ -163,6 +163,11 @@ def main():
         # use config filename as default work_dir if cfg.work_dir is None
         cfg.work_dir = osp.join(project_root + "/output_work_dirs", config_name)
 
+    test_py_dir = os.path.realpath(__file__).replace("train", "test")
+    test_config_dir = os.path.join(
+        cfg.work_dir, osp.basename(args.config).replace(".py", "_copy.py")
+    )
+    shutil.copy(args.config, test_config_dir)
     # enable automatic-mixed-precision training
     if args.amp is True:
         optim_wrapper = cfg.optim_wrapper.type
@@ -215,9 +220,7 @@ def main():
 
     # start training
     runner.train()
-    test_py_dir = os.path.realpath(__file__).replace("train", "test")
-    test_config_dir = os.path.join(cfg.work_dir, osp.basename(args.config))
-    shutil.copy(args.config, test_config_dir)
+
     os.system(
         "python {} --config {} --phase {}".format(test_py_dir, test_config_dir, "train")
     )
