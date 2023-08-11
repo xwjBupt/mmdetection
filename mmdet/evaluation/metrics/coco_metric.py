@@ -79,6 +79,7 @@ class CocoMetric(BaseMetric):
         outfile_prefix: Optional[str] = None,
         file_client_args: dict = None,
         backend_args: dict = None,
+        box_contain_thresh: float = 0.1,
         collect_device: str = "cpu",
         prefix: Optional[str] = None,
         sort_categories: bool = False,
@@ -86,6 +87,7 @@ class CocoMetric(BaseMetric):
         super().__init__(collect_device=collect_device, prefix=prefix)
         # coco evaluation metrics
         self.metrics = metric if isinstance(metric, list) else [metric]
+        self.box_contain_thresh = box_contain_thresh
         allowed_metrics = ["bbox", "segm", "proposal", "proposal_fast"]
         for metric in self.metrics:
             if metric not in allowed_metrics:
@@ -477,6 +479,7 @@ class CocoMetric(BaseMetric):
             coco_eval = COCOeval(self._coco_api, coco_dt, iou_type)
 
             coco_eval.params.catIds = self.cat_ids
+            coco_eval.params.box_contain_thresh = self.box_contain_thresh
             coco_eval.params.imgIds = self.img_ids
             coco_eval.params.maxDets = list(self.proposal_nums)
             coco_eval.params.iouThrs = self.iou_thrs

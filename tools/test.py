@@ -15,7 +15,6 @@ import copy
 from mmengine import ConfigDict
 from mmengine.config import Config, DictAction
 from mmengine.runner import Runner
-
 from mmdet.engine.hooks.utils import trigger_visualization_hook
 from mmdet.evaluation import DumpDetResults
 from mmdet.registry import RUNNERS
@@ -91,9 +90,6 @@ def parse_args():
     if "LOCAL_RANK" not in os.environ:
         os.environ["LOCAL_RANK"] = str(args.local_rank)
     return args
-
-
-import torch
 
 
 def force_cudnn_initialization():
