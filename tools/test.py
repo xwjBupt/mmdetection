@@ -152,6 +152,7 @@ def main():
     epoch_name = os.path.basename(checkpoint).split("_")[-1][:-4]
     work_dir = checkpoint[:-4].replace("epoch_", "Show_epoch_") + "_%s" % phase
     cfg.work_dir = work_dir
+    args.show_dir = work_dir
     cfg.load_from = checkpoint
     # if not args.show_dir:
     #     work_dir = checkpoint[:-4].replace("epoch_", "Show_epoch_") + "_%s" % phase

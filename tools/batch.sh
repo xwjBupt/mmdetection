@@ -1,0 +1,6 @@
+python /home/xwj/WORK/xcode/mmdetection/tools/test.py --config /home/xwj/WORK/xcode/mmdetection/output_work_dirs/deformable-detr-refine-twostage_r50_16xb2-300e_coco_stenosis_binary_F0/deformable-detr-refine-twostage_r50_16xb2-300e_coco_stenosis_binary_F0.py
+python /home/xwj/WORK/xcode/mmdetection/tools/test.py --config /home/xwj/WORK/xcode/mmdetection/output_work_dirs/faster-rcnn_hrnetv2p-w40-1x_coco_stenosis_binary_F0/faster-rcnn_hrnetv2p-w40-1x_coco_stenosis_binary_F0.py
+python /home/xwj/WORK/xcode/mmdetection/tools/test.py --config /home/xwj/WORK/xcode/mmdetection/output_work_dirs/faster-rcnn_r50_fpn_300e_lr5e-2_stenosis_binary_F0/faster-rcnn_r50_fpn_300e_lr5e-2_stenosis_binary_F0.py
+python /home/xwj/WORK/xcode/mmdetection/tools/test.py --config /home/xwj/WORK/xcode/mmdetection/output_work_dirs/retinanet_r50_fpn_300e_coco_stenosis_binary_F0/retinanet_r50_fpn_300e_coco_stenosis_binary_F0.py
+python /home/xwj/WORK/xcode/mmdetection/tools/test.py --config /home/xwj/WORK/xcode/mmdetection/output_work_dirs/retinanet_swin-t-p4-w7_fpn_300e_coco_stenosis_binary_F0/retinanet_swin-t-p4-w7_fpn_300e_coco_stenosis_binary_F0.py
+python /home/xwj/WORK/xcode/mmdetection/tools/test.py --config /home/xwj/WORK/xcode/mmdetection/output_work_dirs/ssd512_300e_coco_stenosis_binary_F0/ssd512_300e_coco_stenosis_binary_F0.py
