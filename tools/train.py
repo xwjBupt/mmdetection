@@ -167,7 +167,7 @@ def main():
     test_config_dir = os.path.join(
         cfg.work_dir, osp.basename(args.config).replace(".py", "_copy.py")
     )
-    shutil.copy(args.config, test_config_dir)
+
     # enable automatic-mixed-precision training
     if args.amp is True:
         optim_wrapper = cfg.optim_wrapper.type
@@ -220,7 +220,7 @@ def main():
 
     # start training
     runner.train()
-
+    shutil.copy(args.config, test_config_dir)
     os.system(
         "python {} --config {} --phase {}".format(test_py_dir, test_config_dir, "train")
     )
