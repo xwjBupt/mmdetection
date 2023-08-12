@@ -450,7 +450,7 @@ class CocoMetric(BaseMetric):
                 log_msg = []
                 for i, num in enumerate(self.proposal_nums):
                     eval_results[f"AR@{num}"] = ar[i]
-                    log_msg.append(f"\nAR@{num}\t{ar[i]:.4f}")
+                    log_msg.append(f"\nAR@{num}\t{ar[i]:.5f}")
                 log_msg = "".join(log_msg)
                 logger.info(log_msg)
                 continue
@@ -521,7 +521,7 @@ class CocoMetric(BaseMetric):
                     ]
 
                 for item in metric_items:
-                    val = float(f"{coco_eval.stats[coco_metric_names[item]]:.3f}")
+                    val = float(f"{coco_eval.stats[coco_metric_names[item]]:.5f}")
                     eval_results[item] = val
             else:
                 coco_eval.evaluate()
@@ -547,8 +547,8 @@ class CocoMetric(BaseMetric):
                         else:
                             ap = float("nan")
                         t.append(f'{nm["name"]}')
-                        t.append(f"{round(ap, 3)}")
-                        eval_results[f'{nm["name"]}_precision'] = round(ap, 3)
+                        t.append(f"{round(ap, 5)}")
+                        eval_results[f'{nm["name"]}_precision'] = round(ap, 5)
 
                         # indexes of IoU  @50 and @75
                         for iou in [0, 5]:
@@ -558,7 +558,7 @@ class CocoMetric(BaseMetric):
                                 ap = np.mean(precision)
                             else:
                                 ap = float("nan")
-                            t.append(f"{round(ap, 3)}")
+                            t.append(f"{round(ap, 5)}")
 
                         # indexes of area of small, median and large
                         for area in [1, 2, 3]:
@@ -568,7 +568,7 @@ class CocoMetric(BaseMetric):
                                 ap = np.mean(precision)
                             else:
                                 ap = float("nan")
-                            t.append(f"{round(ap, 3)}")
+                            t.append(f"{round(ap, 5)}")
                         results_per_category.append(tuple(t))
 
                     num_columns = len(results_per_category[0])
@@ -603,13 +603,13 @@ class CocoMetric(BaseMetric):
                 for metric_item in metric_items:
                     key = f"{metric}_{metric_item}"
                     val = coco_eval.stats[coco_metric_names[metric_item]]
-                    eval_results[key] = float(f"{round(val, 3)}")
+                    eval_results[key] = float(f"{round(val, 5)}")
 
                 ap = coco_eval.stats[:6]
                 logger.info(
-                    f"{metric}_mAP_copypaste: {ap[0]:.3f} "
-                    f"{ap[1]:.3f} {ap[2]:.3f} {ap[3]:.3f} "
-                    f"{ap[4]:.3f} {ap[5]:.3f}"
+                    f"{metric}_mAP_copypaste: {ap[0]:.5f} "
+                    f"{ap[1]:.5f} {ap[2]:.5f} {ap[3]:.5f} "
+                    f"{ap[4]:.5f} {ap[5]:.5f}"
                 )
 
         if tmp_dir is not None:
