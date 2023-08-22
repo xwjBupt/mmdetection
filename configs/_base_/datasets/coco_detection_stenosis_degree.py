@@ -1,6 +1,4 @@
 # dataset settings
-import numpy as np
-
 dataset_type = "CocoStenosisDegreeDataset"
 data_root = "/home/xwj/Xdata/stenosis/selected/Degree/FOLD0"
 dataset_name = "STENOSIS_DEGREE"
