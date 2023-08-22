@@ -26,13 +26,20 @@ backend_args = None
 train_pipeline = [
     dict(type="LoadImageFromFile", backend_args=backend_args),
     dict(type="LoadAnnotations", with_bbox=True),
-    dict(type="Resize", scale=(1333, 800), keep_ratio=True),
+    dict(
+        type="RandomCrop",
+        crop_size=(0.5, 0.5),
+        crop_type="relative_range",
+        recompute_bbox=True,
+        allow_negative_crop=True,
+    ),
+    dict(type="Resize", scale=(1024, 1024), keep_ratio=True),
     dict(type="RandomFlip", prob=0.5),
     dict(type="PackDetInputs"),
 ]
 test_pipeline = [
     dict(type="LoadImageFromFile", backend_args=backend_args),
-    dict(type="Resize", scale=(1333, 800), keep_ratio=True),
+    dict(type="Resize", scale=(1024, 1024), keep_ratio=True),
     # If you don't have a gt annotation, delete the pipeline
     dict(type="LoadAnnotations", with_bbox=True),
     dict(
@@ -41,7 +48,7 @@ test_pipeline = [
     ),
 ]
 train_dataloader = dict(
-    batch_size=32,
+    batch_size=4,
     num_workers=8,
     persistent_workers=True,
     sampler=dict(type="DefaultSampler", shuffle=True),
@@ -49,7 +56,7 @@ train_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file="annotations/train_multi.json",
+        ann_file="annotations/train_degree.json",
         data_prefix=dict(img="train/"),
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         pipeline=train_pipeline,
@@ -57,15 +64,15 @@ train_dataloader = dict(
     ),
 )
 val_dataloader = dict(
-    batch_size=16,
-    num_workers=8,
+    batch_size=8,
+    num_workers=4,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type="DefaultSampler", shuffle=False),
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file="annotations/val_multi.json",
+        ann_file="annotations/val_degree.json",
         data_prefix=dict(img="val/"),
         test_mode=True,
         pipeline=test_pipeline,
@@ -73,18 +80,15 @@ val_dataloader = dict(
     ),
 )
 test_dataloader = val_dataloader
-
 val_evaluator = dict(
     type="CocoMetric",
-    ann_file=data_root + "annotations/val_multi.json",
+    ann_file=data_root + "annotations/val_degree.json",
     metric="bbox",
-    iou_thrs=np.linspace(
-        0.1, 0.95, int(np.round((0.95 - 0.1) / 0.05)) + 1, endpoint=True
-    ),
     format_only=False,
     backend_args=backend_args,
 )
 test_evaluator = val_evaluator
+
 
 # inference on test dataset and
 # format the output results for submission.

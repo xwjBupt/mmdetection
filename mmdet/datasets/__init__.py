@@ -48,5 +48,6 @@ __all__ = [
     "Objects365V2Dataset",
     "CocoStenosisDataset",
     "CocoStenosisBinaryDataset",
+    "CocoStenosisDegreeDataset",
     "CocoArcadeDataset",
 ]
