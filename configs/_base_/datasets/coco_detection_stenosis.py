@@ -1,9 +1,9 @@
 # dataset settings
-dataset_type = "CocoStenosisDegreeDataset"
-data_root = "/home/xwj/Xdata/stenosis/selected/Degree/FOLD0/"
-dataset_name = "STENOSIS_DEGREE"
-train_ann_file = "/annotations/train_degree.json"
-val_ann_file = "/annotations/val_degree.json"
+dataset_type = "CocoStenosisDataset"
+data_root = "/home/xwj/Xdata/stenosis/selected/Multi/FOLD0/"
+dataset_name = "STENOSIS_MULTI"
+train_ann_file = "/annotations/train_multi.json"
+val_ann_file = "/annotations/val_multi.json"
 train_data_prefix = dict(img="train/")
 val_data_prefix = dict(img="val/")
 # Example to use different file client
@@ -54,7 +54,7 @@ train_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file="annotations/train_degree.json",
+        ann_file="annotations/train_multi.json",
         data_prefix=dict(img="train/"),
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         pipeline=train_pipeline,
@@ -70,7 +70,7 @@ val_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file="annotations/val_degree.json",
+        ann_file="annotations/val_multi.json",
         data_prefix=dict(img="val/"),
         test_mode=True,
         pipeline=test_pipeline,
@@ -80,7 +80,7 @@ val_dataloader = dict(
 test_dataloader = val_dataloader
 val_evaluator = dict(
     type="CocoMetric",
-    ann_file=data_root + "annotations/val_degree.json",
+    ann_file=data_root + "annotations/val_multi.json",
     metric="bbox",
     format_only=False,
     backend_args=backend_args,
