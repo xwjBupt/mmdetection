@@ -13,3 +13,8 @@ model = dict(
         init_cfg=dict(type="Pretrained", checkpoint="open-mmlab://resnext101_64x4d"),
     )
 )
+train_dataloader = dict(batch_size=4, num_workers=8)
+val_dataloader = dict(
+    batch_size=8,
+    num_workers=8,
+)
