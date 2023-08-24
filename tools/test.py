@@ -241,14 +241,17 @@ def main():
         best_coco_bbox_result_dict["Method"] = checkpoint.split("output_work_dirs")[-1]
         best_coco_bbox_result_dict["Phase"] = phase
     print("\n\n")
-
+    csvname = os.path.join(project_root, dataset_name + ".csv")
     write_to_csv(
-        os.path.join(project_root, dataset_name + ".csv"),
+        csvname,
         best_coco_bbox_result_dict,
     )
     logger.info(
-        "FINAL best coco_bbox_mAP {} @ Epoch {} with result as {}".format(
-            best_coco_bbox_mAP, best_coco_bbox_mAP_epoch, best_coco_bbox_result_dict
+        "FINAL best coco_bbox_mAP {} @ Epoch {} with result as {} to ".format(
+            best_coco_bbox_mAP,
+            best_coco_bbox_mAP_epoch,
+            best_coco_bbox_result_dict,
+            csvname,
         )
     )
     del runner
